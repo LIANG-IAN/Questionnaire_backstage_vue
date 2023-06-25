@@ -8,12 +8,14 @@ export default {
       identity: "true", // 管理員與否，預計 SessionStorage
       path: "", // 路徑,
       questionnaireList: [], // 問卷,
-      pageTotal:1, // 頁數
-      page:1, // 當前頁數
+      pageTotal: 1, // 頁數
+      page: 1, // 當前頁數
+      checkedList:[], // 被勾選問卷
+      isChecked:false,
       
       
       findAll: import.meta.env.VITE_FIND_ALL,
-     
+      
     }
   },
   methods: {
@@ -24,7 +26,7 @@ export default {
       const endTime = new Date(questionnaire.endTime);
       
       if (today < startingTime) {
-        return "未開始";
+        return "尚未開始";
       }
       else if (today > endTime) {
         return "已結束";
@@ -43,8 +45,14 @@ export default {
     
     
     // 判斷點擊第幾頁
-    pagination(element){
+    pagination(element) {
       this.page = element.target.innerText;
+    },
+    
+    
+    // 勾選
+    check(questionnaireId){
+    
     }
   },
   async mounted() {
@@ -67,15 +75,16 @@ export default {
     // 管理員與否，決定路徑
     path() {
       return this.identity === "true" ? "/questionnaireManage" : "/fillQuestionnaire";
-    }
+    },
+    
   }
 }
 </script>
 
 <template>
   <div class="overview-box">
-    <span class="delete-Questionnaire" v-show="identity === 'true'">✖</span>
-    <span class="add-Questionnaire" v-show="identity === 'true'">✚</span>
+    <span v-show="identity === 'true'" class="delete-Questionnaire">✖</span>
+    <span v-show="identity === 'true'" class="add-Questionnaire">✚</span>
     <table>
       <thead>
       <tr>
@@ -89,20 +98,34 @@ export default {
       </tr>
       </thead>
       <tbody>
-      <tr v-for="(questionnaire,index) in questionnaireList && questionnaireList.slice(page * 9 - 9, page * 9)">
+      <tr v-for="questionnaire in questionnaireList && questionnaireList.slice(page * 10 - 10, page * 10)">
         <td v-show="identity === 'true'">
-          <input :data-id="questionnaire.id" type="checkbox">
+          <input :data-id="questionnaire.id" type="checkbox" :checked="isChecked" @click="check(questionnaire.id)">
         </td>
         <td>{{ questionnaire.id }}</td>
-        <td>
+        
+        
+        <!--   是否渲染 router-link   -->
+        <td v-if="getState(questionnaire) === '進行中'">
           <router-link :data-id="questionnaire.id" :to="path">{{ questionnaire.questionnaire }}</router-link>
         </td>
+        <td v-else-if="identity === 'true'">
+          <router-link :data-id="questionnaire.id" :to="path">{{ questionnaire.questionnaire }}</router-link>
+        </td>
+        <td v-else>{{ questionnaire.questionnaire }}</td>
+        
+        
         <td v-text="getState(questionnaire)"></td>
         <td>{{ questionnaire.startingTime }}</td>
         <td>{{ questionnaire.endTime }}</td>
-        <td>
+        
+        
+        <!--   是否渲染 router-link   -->
+        <td v-if="getState(questionnaire) !== '尚未開始'">
           <router-link :data-id="questionnaire.id" to="/result">我是結果</router-link>
         </td>
+        <td v-else>我是結果</td>
+      
       </tr>
       </tbody>
     </table>
@@ -113,12 +136,12 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-.overview-box{
-  table{
+.overview-box {
+  table {
     text-align: center;
   }
   
-  .page-item{
+  .page-item {
     text-align: center;
   }
 }
