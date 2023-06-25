@@ -1,42 +1,71 @@
 <script>
 import axios from 'axios';
+import {useStore} from "@/stores/searchQuestionnaireFuzzyResult"
 
 export default {
   data() {
     return {
-      identity: "true", //管理員與否，預計sessionStorage
-      path: "", //路徑,
-      questionnaireList: {}, //問卷
-      today: Date.now(), //今天日期
+      identity: "true", // 管理員與否，預計 SessionStorage
+      path: "", // 路徑,
+      questionnaireList: [], // 問卷,
+      pageTotal:1, // 頁數
+      page:1, // 當前頁數
       
       
-      findAllUrl: import.meta.env.VITE_FIND_ALL,
+      findAll: import.meta.env.VITE_FIND_ALL,
+     
     }
   },
   methods: {
+    // 判斷問卷狀態
     getState(questionnaire) {
+      const today = Date.now(); // 今天日期
       const startingTime = new Date(questionnaire.startingTime);
       const endTime = new Date(questionnaire.endTime);
       
-      if (this.today < startingTime) {
+      if (today < startingTime) {
         return "未開始";
-      } else if (this.today > endTime) {
+      }
+      else if (today > endTime) {
         return "已結束";
-      } else {
+      }
+      else {
         return "進行中";
       }
+    },
+    
+    
+    // 從 Pinia Store 更新問卷列表
+    updateQuestionnaireList() {
+      const store = useStore();
+      this.questionnaireList = store.searchQuestionnaireFuzzyResult;
+    },
+    
+    
+    // 判斷點擊第幾頁
+    pagination(element){
+      this.page = element.target.innerText;
     }
   },
-  mounted() {
+  async mounted() {
     // 取得所有問卷
-    axios.get(this.findAllUrl).then(res => {
-      this.questionnaireList = res.data.questionnaireList;
-      console.log(this.questionnaireList);
-    })
+    const response = await axios.get(this.findAll);
+    this.questionnaireList = response.data.questionnaireList;
+    console.log(this.questionnaireList);
+    
+    // 監聽 Pinia Store 的變化，並更新問卷列表
+    const store = useStore();
+    this.$watch(() => store.searchQuestionnaireFuzzyResult, this.updateQuestionnaireList);
+    
+    
+    // 計算頁數
+    const dataTotal = this.questionnaireList.length;
+    const perPage = 10;
+    this.pageTotal = Math.ceil(dataTotal / perPage);
   },
   computed: {
+    // 管理員與否，決定路徑
     path() {
-      // 管理員與否，決定路徑
       return this.identity === "true" ? "/questionnaireManage" : "/fillQuestionnaire";
     }
   }
@@ -45,10 +74,12 @@ export default {
 
 <template>
   <div class="overview-box">
+    <span class="delete-Questionnaire" v-show="identity === 'true'">✖</span>
+    <span class="add-Questionnaire" v-show="identity === 'true'">✚</span>
     <table>
       <thead>
       <tr>
-        <th>選取</th>
+        <th v-show="identity === 'true'">選取</th>
         <th>編號</th>
         <th>問卷名稱</th>
         <th>狀態</th>
@@ -58,10 +89,11 @@ export default {
       </tr>
       </thead>
       <tbody>
-      <tr v-for="(questionnaire,index) in questionnaireList">
-        <td>
-          <input :data-id="questionnaire.id" type="checkbox">{{ questionnaire.id }}
+      <tr v-for="(questionnaire,index) in questionnaireList && questionnaireList.slice(page * 9 - 9, page * 9)">
+        <td v-show="identity === 'true'">
+          <input :data-id="questionnaire.id" type="checkbox">
         </td>
+        <td>{{ questionnaire.id }}</td>
         <td>
           <router-link :data-id="questionnaire.id" :to="path">{{ questionnaire.questionnaire }}</router-link>
         </td>
@@ -74,9 +106,21 @@ export default {
       </tr>
       </tbody>
     </table>
+    <div class="page-item">
+      <span v-for="page in pageTotal" v-on:click="pagination">{{ page }}</span>
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.overview-box{
+  table{
+    text-align: center;
+  }
+  
+  .page-item{
+    text-align: center;
+  }
+}
 
 </style>

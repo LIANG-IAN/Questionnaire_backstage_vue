@@ -16,5 +16,10 @@ export default {
 </template>
 
 <style scoped lang="scss">
-
+.overview{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
 </style>
