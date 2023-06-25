@@ -10,11 +10,12 @@ export default {
       questionnaireList: [], // 問卷,
       pageTotal: 1, // 頁數
       page: 1, // 當前頁數
-      checkedList:[], // 被勾選問卷
-      isChecked:false,
+      checkedList: [], // 被勾選問卷
+      isChecked: false,
       
       
       findAll: import.meta.env.VITE_FIND_ALL,
+      deleteQuestionnaire:import.meta.env.VITE_DELETE_QUESTIONNAIRE
       
     }
   },
@@ -51,15 +52,27 @@ export default {
     
     
     // 勾選
-    check(questionnaireId){
+    check(questionnaireId) {
+      if (this.checkedList.includes(questionnaireId)) {
+        const index = this.checkedList.indexOf(questionnaireId);
+        this.checkedList.splice(index, 1);
+      }else {
+        this.checkedList.push(questionnaireId);
+      }
+    },
     
+    
+    deleteQuestion(questionnaireIdList){
+      axios.post(this.deleteQuestionnaire,{"idList":questionnaireIdList}).then(response=>{
+        alert(response.data.message);
+      })
     }
   },
   async mounted() {
     // 取得所有問卷
     const response = await axios.get(this.findAll);
     this.questionnaireList = response.data.questionnaireList;
-    console.log(this.questionnaireList);
+    
     
     // 監聽 Pinia Store 的變化，並更新問卷列表
     const store = useStore();
@@ -83,7 +96,7 @@ export default {
 
 <template>
   <div class="overview-box">
-    <span v-show="identity === 'true'" class="delete-Questionnaire">✖</span>
+    <span v-show="identity === 'true'" @click="deleteQuestion(checkedList)" class="delete-Questionnaire">✖</span>
     <span v-show="identity === 'true'" class="add-Questionnaire">✚</span>
     <table>
       <thead>
@@ -100,7 +113,7 @@ export default {
       <tbody>
       <tr v-for="questionnaire in questionnaireList && questionnaireList.slice(page * 10 - 10, page * 10)">
         <td v-show="identity === 'true'">
-          <input :data-id="questionnaire.id" type="checkbox" :checked="isChecked" @click="check(questionnaire.id)">
+          <input :checked="isChecked" :data-id="questionnaire.id" type="checkbox" @click="check(questionnaire.id)">
         </td>
         <td>{{ questionnaire.id }}</td>
         
