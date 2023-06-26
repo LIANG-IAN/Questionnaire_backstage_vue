@@ -1,0 +1,74 @@
+<script>
+
+export default {
+  data() {
+    return {
+      selectedIndex: 0,
+    }
+  },
+  methods: {
+    // 頁標渲染
+    selectTab(index) {
+      this.selectedIndex = index;
+    },
+    
+    
+    // 跳轉頁面
+    navigateTo(path) {
+      this.$router.push(path);
+    }
+  }
+}
+</script>
+
+<template>
+  <div class="backstage">
+    <header>
+      <span :class="{ 'render-gray': selectedIndex === 0 }"
+            @click="navigateTo('/backstage/questionnaireManage'); selectTab(0)">問卷</span>
+      <span :class="{ 'render-gray': selectedIndex === 1 }"
+            @click="navigateTo('/backstage/topic'); selectTab(1)">問卷題目</span>
+      <span :class="{ 'render-gray': selectedIndex === 2 }"
+            @click="navigateTo('/backstage/feedback'); selectTab(2)">問卷回饋</span>
+      <span :class="{ 'render-gray': selectedIndex === 3 }"
+            @click="navigateTo('/backstage/statistics'); selectTab(3)">統計</span>
+    </header>
+    <div class="router-view">
+      <RouterView/>
+    </div>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.backstage {
+  display: flex;
+  flex-direction: column;
+  width: 700px;
+  height: 700px;
+  border: 1px solid black;
+  
+  
+  header {
+    width: 400px;
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    background-color: grey;
+    
+    span {
+      flex: 1;
+      text-align: center;
+      border-radius: 10px 10px 0 0;
+    }
+    
+    .render-gray {
+      background-color: #f3d26f;
+    }
+  }
+  
+  .router-view {
+    flex-grow: 1;
+    background-color: #f3d26f;
+  }
+}
+</style>

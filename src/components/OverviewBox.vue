@@ -5,7 +5,7 @@ import {useStore} from "@/stores/searchQuestionnaireFuzzyResult"
 export default {
   data() {
     return {
-      identity: "true", // 管理員與否，預計 SessionStorage
+      identity: sessionStorage.getItem("identity"), // 管理員與否
       path: "", // 路徑,
       questionnaireList: [], // 問卷,
       pageTotal: 1, // 頁數
@@ -62,13 +62,36 @@ export default {
     },
     
     
+    // 刪除問卷
     deleteQuestion(questionnaireIdList){
       axios.post(this.deleteQuestionnaire,{"idList":questionnaireIdList}).then(response=>{
         alert(response.data.message);
       })
+    },
+    
+    
+    // 紀錄點擊
+    setSession(id){
+      sessionStorage.setItem("id",id);
+    },
+    
+    
+    // 跳轉頁面
+    navigateTo(path) {
+      this.$router.push(path);
+    },
+    
+    
+    // 清除 sessionStorage
+    removeSession(item){
+      sessionStorage.removeItem(item);
     }
   },
   async mounted() {
+    //畫面一進來消除 sessionStorage
+    sessionStorage.removeItem("id");
+    
+    
     // 取得所有問卷
     const response = await axios.get(this.findAll);
     this.questionnaireList = response.data.questionnaireList;
@@ -87,7 +110,7 @@ export default {
   computed: {
     // 管理員與否，決定路徑
     path() {
-      return this.identity === "true" ? "/questionnaireManage" : "/fillQuestionnaire";
+      return this.identity === "true" ? "/backstage" : "/fillQuestionnaire";
     },
     
   }
@@ -97,7 +120,7 @@ export default {
 <template>
   <div class="overview-box">
     <span v-show="identity === 'true'" @click="deleteQuestion(checkedList)" class="delete-Questionnaire">✖</span>
-    <span v-show="identity === 'true'" class="add-Questionnaire">✚</span>
+    <span v-show="identity === 'true'" @click="navigateTo('/backstage/questionnaireManage'); removeSession(`questionnaireObject`)" class="add-Questionnaire">✚</span>
     <table>
       <thead>
       <tr>
@@ -120,10 +143,10 @@ export default {
         
         <!--   是否渲染 router-link   -->
         <td v-if="getState(questionnaire) === '進行中'">
-          <router-link :data-id="questionnaire.id" :to="path">{{ questionnaire.questionnaire }}</router-link>
+          <router-link :data-id="questionnaire.id" :to="path" @click="setSession(questionnaire.id)">{{ questionnaire.questionnaire }}</router-link>
         </td>
         <td v-else-if="identity === 'true'">
-          <router-link :data-id="questionnaire.id" :to="path">{{ questionnaire.questionnaire }}</router-link>
+          <router-link :data-id="questionnaire.id" :to="path" @click="setSession(questionnaire.id)">{{ questionnaire.questionnaire }}</router-link>
         </td>
         <td v-else>{{ questionnaire.questionnaire }}</td>
         
