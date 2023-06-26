@@ -10,8 +10,10 @@ export default {
       questionnaire: {
         questionnaire: "",
         mainPoint: "",
-        startingTime: "",
-        endTime: ""
+        startingTime: new Date().toISOString().substring(0,10),
+        endTime: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000)
+            .toISOString()
+            .substring(0, 10)
       },
       
       findByQuestionnaireId: import.meta.env.VITE_FIND_BY_QUESTIONNAIRE_ID,

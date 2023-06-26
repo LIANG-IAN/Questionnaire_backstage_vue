@@ -15,7 +15,7 @@ export default {
       
       
       findAll: import.meta.env.VITE_FIND_ALL,
-      deleteQuestionnaire:import.meta.env.VITE_DELETE_QUESTIONNAIRE
+      deleteQuestionnaire: import.meta.env.VITE_DELETE_QUESTIONNAIRE
       
     }
   },
@@ -56,23 +56,24 @@ export default {
       if (this.checkedList.includes(questionnaireId)) {
         const index = this.checkedList.indexOf(questionnaireId);
         this.checkedList.splice(index, 1);
-      }else {
+      }
+      else {
         this.checkedList.push(questionnaireId);
       }
     },
     
     
     // 刪除問卷
-    deleteQuestion(questionnaireIdList){
-      axios.post(this.deleteQuestionnaire,{"idList":questionnaireIdList}).then(response=>{
+    deleteQuestion(questionnaireIdList) {
+      axios.post(this.deleteQuestionnaire, {"idList": questionnaireIdList}).then(response => {
         alert(response.data.message);
       })
     },
     
     
     // 紀錄點擊
-    setSession(id){
-      sessionStorage.setItem("id",id);
+    setSession(id) {
+      sessionStorage.setItem("id", id);
     },
     
     
@@ -83,7 +84,7 @@ export default {
     
     
     // 清除 sessionStorage
-    removeSession(item){
+    removeSession(item) {
       sessionStorage.removeItem(item);
     }
   },
@@ -119,8 +120,10 @@ export default {
 
 <template>
   <div class="overview-box">
-    <span v-show="identity === 'true'" @click="deleteQuestion(checkedList)" class="delete-Questionnaire">✖</span>
-    <span v-show="identity === 'true'" @click="navigateTo('/backstage/questionnaireManage'); removeSession(`questionnaireObject`)" class="add-Questionnaire">✚</span>
+    <span v-show="identity === 'true'" class="delete-Questionnaire" @click="deleteQuestion(checkedList)">✖</span>
+    <span v-show="identity === 'true'"
+          class="add-Questionnaire"
+          @click="navigateTo('/backstage/questionnaireManage'); removeSession(`questionnaireObject`)">✚</span>
     <table>
       <thead>
       <tr>
@@ -134,7 +137,8 @@ export default {
       </tr>
       </thead>
       <tbody>
-      <tr v-for="questionnaire in questionnaireList && questionnaireList.slice(page * 10 - 10, page * 10)">
+      <tr v-for="(questionnaire,index) in questionnaireList && questionnaireList.slice(page * 10 - 10, page * 10)"
+          :key="index">
         <td v-show="identity === 'true'">
           <input :checked="isChecked" :data-id="questionnaire.id" type="checkbox" @click="check(questionnaire.id)">
         </td>
@@ -143,10 +147,14 @@ export default {
         
         <!--   是否渲染 router-link   -->
         <td v-if="getState(questionnaire) === '進行中'">
-          <router-link :data-id="questionnaire.id" :to="path" @click="setSession(questionnaire.id)">{{ questionnaire.questionnaire }}</router-link>
+          <router-link :data-id="questionnaire.id" :to="path" @click="setSession(questionnaire.id)">
+            {{ questionnaire.questionnaire }}
+          </router-link>
         </td>
         <td v-else-if="identity === 'true'">
-          <router-link :data-id="questionnaire.id" :to="path" @click="setSession(questionnaire.id)">{{ questionnaire.questionnaire }}</router-link>
+          <router-link :data-id="questionnaire.id" :to="path" @click="setSession(questionnaire.id)">
+            {{ questionnaire.questionnaire }}
+          </router-link>
         </td>
         <td v-else>{{ questionnaire.questionnaire }}</td>
         
@@ -166,7 +174,7 @@ export default {
       </tbody>
     </table>
     <div class="page-item">
-      <span v-for="page in pageTotal" v-on:click="pagination">{{ page }}</span>
+      <span v-for="(page,index) in pageTotal" :key="index" v-on:click="pagination">{{ page }}</span>
     </div>
   </div>
 </template>
