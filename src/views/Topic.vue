@@ -5,7 +5,8 @@ import axios from "axios";
 export default {
     data() {
         return {
-            id: 11,
+            //TODO
+            id: null,
             optionAmount: [1], // 選項 Input
             questionAmount: 1,// 問題區塊
             questionnaireContentList: [
@@ -33,17 +34,21 @@ export default {
             const questionnaire = {
                 question: "",
                 options: "",
-                necessary: 0,
+                necessary: false,
                 type: "text",
                 questionnaire: {
-                    //TODO
-                    // id: sessionStorage.getItem("id")
                     id: 11
                 }
             };
             this.questionnaireContentList.push(questionnaire);
             this.optionAmount.push(1);
-            this.optionArray.push([])
+            this.optionArray.push([]);
+            
+            // 新增以下程式碼，初始化對應的子陣列
+            for (let i = 0; i < this.optionAmount[item]; i++) {
+                this.optionArray[item].push("");
+            }
+            
             item++;
             return item;
         },
@@ -76,6 +81,7 @@ export default {
         },
         
         
+        // 將陣列減到剩 array[0]
         minusInput(array) {
             return array.slice(0, 1);
         },
@@ -83,7 +89,7 @@ export default {
         
         // 送出 (新增)
         send() {
-            axios.post(this.addQuestionnaireContent,{"questionnaireContentList":this.questionnaireContentList}).then(response=>{
+            axios.post(this.addQuestionnaireContent, {"questionnaireContentList": this.questionnaireContentList}).then(response => {
                 console.log(response.data.message)
             })
         },
@@ -91,11 +97,32 @@ export default {
         
     },
     mounted() {
-        // 獲得所有題目
-        axios.post(this.findAllByQuestionnaireId, {"questionnaireId": this.id}).then(response => {
-            console.log(response.data)
-        })
+        // 取得所有題目並渲染
+        if (this.id !== null) {
+            axios.post(this.findAllByQuestionnaireId, {"questionnaireId": this.id}).then(response => {
+                console.log(response.data)
+            })
+        }
         
+        // 取的緩存並渲染
+        else {
+            const questionnaireContentList = sessionStorage.getItem("questionnaireContentListObject");
+            if (questionnaireContentList) {
+                const obj = JSON.parse(questionnaireContentList);
+                this.questionnaireContentList = obj;
+                this.questionAmount = this.questionnaireContentList.length;
+                
+                // 轉換選項值到 optionArray
+                this.questionnaireContentList.forEach((question, index) => {
+                    if (question.options) {
+                        this.optionArray[index] = question.options.split(';');
+                    }
+                    else {
+                        this.optionArray[index] = [];
+                    }
+                });
+            }
+        }
     },
     watch: {
         // 暫存
@@ -106,10 +133,14 @@ export default {
             },
             deep: true
         },
+        
+        // 即時轉換 input 內容
         optionArray: {
             handler() {
                 this.questionnaireContentList.forEach((question, index) => {
-                    question.options = this.optionArray[index].join(';');
+                    if (this.optionArray[index]) {
+                        question.options = this.optionArray[index].join(';');
+                    }
                 });
             },
             deep: true
@@ -141,10 +172,11 @@ export default {
             
             <!--  我是問題內容  -->
             <div class="option-block">
-                <label for="answer">回答</label>
+                <label :for="'answer'+index">回答</label>
                 <input v-for="(n, i) in optionAmount[index]" v-if="questionnaireContentList[index].type !== 'text'"
+                       :id="'answer'+index"
                        :key="i" v-model="optionArray[index][i]" type="text">
-                <input v-else v-model="optionArray[index][0]" type="text">
+                <input v-else :id="'answer'+index" v-model="optionArray[index][0]" type="text">
             </div>
             
             <!--  我是問題類型  -->
