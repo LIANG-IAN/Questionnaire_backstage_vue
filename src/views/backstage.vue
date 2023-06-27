@@ -17,7 +17,27 @@ export default {
     navigateTo(path) {
       this.$router.push(path);
     }
-  }
+  },
+    mounted() {
+        const path = this.$route.path;
+        switch (path) {
+            case '/backstage/questionnaireManage':
+                this.selectedIndex = 0;
+                break
+            case '/backstage/topic':
+                this.selectedIndex = 1;
+                break
+            case '/backstage/feedback':
+                this.selectedIndex = 2;
+                break
+            case '/backstage/statistics':
+                this.selectedIndex = 3;
+                break
+            default:
+                this.selectedIndex = 0;
+                break
+        }
+    }
 }
 </script>
 
@@ -41,34 +61,34 @@ export default {
 
 <style lang="scss" scoped>
 .backstage {
-  display: flex;
-  flex-direction: column;
-  width: 700px;
-  height: 700px;
-  border: 1px solid black;
-  
-  
-  header {
-    width: 400px;
-    height: 50px;
     display: flex;
-    justify-content: space-between;
-    background-color: grey;
+    flex-direction: column;
+    width: 700px;
+    height: 700px;
+    border: 1px solid black;
     
-    span {
-      flex: 1;
-      text-align: center;
-      border-radius: 10px 10px 0 0;
+    
+    header {
+        width: 400px;
+        height: 50px;
+        display: flex;
+        justify-content: space-between;
+        background-color: grey;
+        
+        span {
+            flex: 1;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .render-gray {
+            background-color: #f3d26f;
+        }
     }
     
-    .render-gray {
-      background-color: #f3d26f;
+    .router-view {
+        flex-grow: 1;
+        background-color: #f3d26f;
     }
-  }
-  
-  .router-view {
-    flex-grow: 1;
-    background-color: #f3d26f;
-  }
 }
 </style>

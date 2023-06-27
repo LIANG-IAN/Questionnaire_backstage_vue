@@ -123,7 +123,7 @@ export default {
     <span v-show="identity === 'true'" class="delete-Questionnaire" @click="deleteQuestion(checkedList)">✖</span>
     <span v-show="identity === 'true'"
           class="add-Questionnaire"
-          @click="navigateTo('/backstage/questionnaireManage'); removeSession(`questionnaireObject`)">✚</span>
+          @click="navigateTo('/backstage/questionnaireManage'); removeSession(`questionnaireObject`); removeSession(`questionnaireContentListObject`)">✚</span>
     <table>
       <thead>
       <tr>

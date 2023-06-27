@@ -7,7 +7,9 @@ export default defineComponent({
 </script>
 
 <template>
-<h1>feedback</h1>
+    <div class="feedback">
+        <table></table>
+    </div>
 </template>
 
 <style scoped lang="scss">

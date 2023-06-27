@@ -4,7 +4,7 @@ import axios from "axios";
 export default {
     data() {
         return {
-            id: null,
+            id: sessionStorage.getItem("id"),
             optionAmount: [1], // 選項 Input
             questionAmount: 1, // 問題區塊
             questionnaireContentList: [
@@ -14,20 +14,24 @@ export default {
                     necessary: false,
                     type: "text",
                     questionnaire: {
-                        id: 11,
+                        id: sessionStorage.getItem("id"),
                     },
                 },
             ],
             optionArray: [[]],
+            deletedQuestionIds: [], // 儲存被刪除的 question-block 的 id
             
             addQuestionnaireContent: import.meta.env.VITE_ADD_QUESTIONNAIRE_CONTENT,
+            deleteQuestionnaireContent: import.meta.env.VITE_DELETE_QUESTIONNAIRE_CONTENT,
             findAllByQuestionnaireId: import.meta.env.VITE_FIND_ALL_BY_QUESTIONNAIRE_ID,
+            addQuestionnaire: import.meta.env.VITE_ADD_QUESTIONNAIRE,
         };
     },
     methods: {
         initializeOptionArray() {
             this.optionArray = this.questionnaireContentList.map(() => [""]);
         },
+        
         plusQuestionAmount(item) {
             const questionnaire = {
                 question: "",
@@ -35,7 +39,7 @@ export default {
                 necessary: false,
                 type: "text",
                 questionnaire: {
-                    id: 11,
+                    id: sessionStorage.getItem("id"),
                 },
             };
             this.questionnaireContentList.push(questionnaire);
@@ -47,7 +51,11 @@ export default {
         },
         
         minusQuestionAmount(item) {
-            this.questionnaireContentList.pop();
+            const deletedQuestion = this.questionnaireContentList.pop();
+            if (deletedQuestion) {
+                this.deletedQuestionIds.push(deletedQuestion.id);
+            }
+            console.log(deletedQuestion)
             this.optionAmount.pop();
             this.optionArray.pop();
             item--;
@@ -70,25 +78,65 @@ export default {
             return this.optionArray[index].length;
         },
         
-        // 送出 (新增)
-        send() {
-            axios
-                .post(this.addQuestionnaireContent, {
-                    questionnaireContentList: this.questionnaireContentList,
-                })
-                .then((response) => {
-                    console.log(response.data.message);
-                });
+        
+        delete() {
+            axios.post(this.deleteQuestionnaireContent, {"idList": this.deletedQuestionIds}).then(response => {
+                alert("刪除的: "+response.data.message);
+            })
         },
+        
+        // 送出 (新增)
+        async send() {
+            if (this.id === null) {
+                const storedQuestionnaire = sessionStorage.getItem("questionnaireObject");
+                if (storedQuestionnaire) {
+                    const questionnaire = JSON.parse(storedQuestionnaire);
+                    await axios.post(this.addQuestionnaire, {questionnaire: questionnaire}).then(response => {
+                        alert("新增Questionnaire: " + response.data.message);
+                        this.id = response.data.questionnaire.id;
+                        sessionStorage.setItem("id", this.id)
+                    })
+                }
+                else {
+                    alert("請回上頁新增問卷")
+                }
+            }
+            const id = sessionStorage.getItem("id")
+            this.questionnaireContentList.forEach(function (questionnaireContent, index) {
+                questionnaireContent.questionnaire.id = id;
+            })
+            axios.post(this.addQuestionnaireContent, {
+                questionnaireContentList: this.questionnaireContentList,
+            }).then((response) => {
+                alert("新增QuestionnaireContent: " + response.data.message);
+            });
+        },
+        
+        sendAndDelete() {
+            this.send();
+            this.delete();
+            
+        }
     },
     mounted() {
         if (this.id !== null) {
             axios
-                .post(this.findAllByQuestionnaireId, { questionnaireId: this.id })
+                .post(this.findAllByQuestionnaireId, {questionnaireId: sessionStorage.getItem("id")})
                 .then((response) => {
-                    console.log(response.data);
-                });
-        } else {
+                        if (response.data.message === "尋找成功") {
+                            this.questionnaireContentList = response.data.questionnaireContentList;
+                            this.questionAmount = this.questionnaireContentList.length;
+                            this.initializeOptionArray();
+                            this.questionnaireContentList.forEach((question, index) => {
+                                if (question.options) {
+                                    this.optionArray[index] = question.options.split(";");
+                                }
+                            });
+                        }
+                    }
+                );
+        }
+        else {
             const questionnaireContentList = sessionStorage.getItem(
                 "questionnaireContentListObject"
             );
@@ -101,7 +149,8 @@ export default {
                         this.optionArray[index] = question.options.split(";");
                     }
                 });
-            } else {
+            }
+            else {
                 this.initializeOptionArray();
             }
         }
@@ -109,16 +158,19 @@ export default {
     watch: {
         // 暫存
         questionnaireContentList: {
-            handler() {
+            handler(newValue, oldValue) {
                 this.questionnaireContentList.forEach((question, index) => {
                     // 當問卷類型為 'text' 時，清空選項
                     if (question.type === 'text') {
                         this.optionArray[index] = [];
                         question.options = '';
-                    } else if (!Array.isArray(this.optionArray[index])) {
+                    }
+                    else if (!Array.isArray(this.optionArray[index])) {
                         // 當選項數組不存在或不是數組時，進行初始化
                         this.optionArray[index] = [''];
                     }
+                    
+                    
                 });
                 
                 const temp = JSON.stringify(this.questionnaireContentList);
@@ -147,11 +199,11 @@ export default {
         <div v-for="(question, index) in questionnaireContentList" :key="index" class="question-block">
             <!-- 我是問題題目 -->
             <label :for="'question-' + index">問題</label>
-            <input :id="`question-` + index" v-model="question.question" type="text" />
+            <input :id="`question-` + index" v-model="question.question" type="text"/>
             
             <!-- 是否必須 -->
             <label :for="'necessary-' + index">必須</label>
-            <input :id="'necessary-' + index" v-model="question.necessary" type="checkbox" />
+            <input :id="'necessary-' + index" v-model="question.necessary" type="checkbox"/>
             
             <!-- 我是加加、減減 -->
             <span v-if="question.type !== 'text'" @click="optionAmount[index] = plusOptionAmount(index)">＋</span>
@@ -160,7 +212,8 @@ export default {
             <!-- 我是問題內容 -->
             <div class="option-block">
                 <label :for="'answer'+index">回答</label>
-                <input v-for="(option, optionIndex) in optionArray[index]" v-if="question.type !== 'text'" :key="optionIndex" v-model="optionArray[index][optionIndex]" type="text" />
+                <input v-for="(option, optionIndex) in optionArray[index]" v-if="question.type !== 'text'"
+                       :key="optionIndex" v-model="optionArray[index][optionIndex]" type="text"/>
             </div>
             
             <!-- 我是問題類型 -->
@@ -176,7 +229,7 @@ export default {
             <span @click="questionAmount = plusQuestionAmount(questionAmount)">＋</span>
             <span @click="questionAmount = minusQuestionAmount(questionAmount)">－</span>
         </div>
-        <button type="button" @click="send">送出</button>
+        <button type="button" @click="sendAndDelete">送出</button>
     </div>
 </template>
 
