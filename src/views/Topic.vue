@@ -1,26 +1,32 @@
 <script>
 
+import axios from "axios";
+
 export default {
     data() {
         return {
+            id: 11,
             optionAmount: [1], // 選項 Input
             questionAmount: 1,// 問題區塊
             questionnaireContentList: [
                 {
                     question: "",
                     options: "",
-                    necessary: 0,
-                    type: "",
+                    necessary: false,
+                    type: "text",
                     questionnaire: {
-                        id: sessionStorage.getItem("id")
+                        // TODO
+                        // id: sessionStorage.getItem("id")
+                        id: 11
                     }
                 }
             ],
+            optionArray: [[]],
             
+            
+            addQuestionnaireContent: import.meta.env.VITE_ADD_QUESTIONNAIRE_CONTENT,
+            findAllByQuestionnaireId: import.meta.env.VITE_FIND_ALL_BY_QUESTIONNAIRE_ID
         }
-    },
-    created() {
-        this.$watch('inputType', this.handleInputTypeChange, {deep: true});
     },
     methods: {
         plusQuestionAmount(item) {
@@ -28,19 +34,25 @@ export default {
                 question: "",
                 options: "",
                 necessary: 0,
-                type: "",
+                type: "text",
                 questionnaire: {
-                    id: sessionStorage.getItem("id")
+                    //TODO
+                    // id: sessionStorage.getItem("id")
+                    id: 11
                 }
-            }
+            };
             this.questionnaireContentList.push(questionnaire);
             this.optionAmount.push(1);
+            this.optionArray.push([])
             item++;
             return item;
         },
         
         
         minusQuestionAmount(item) {
+            this.questionnaireContentList.pop();
+            this.optionAmount.pop();
+            this.optionArray.pop();
             item--;
             if (item <= 0) {
                 return item = 1;
@@ -64,32 +76,46 @@ export default {
         },
         
         
-        // 僅使用在 Watch
-        getChangedIndex(newArray, oldArray) {
-            for (let i = 0; i < newArray.length; i++) {
-                if (newArray[i] !== oldArray[i]) {
-                    return i;
-                }
-            }
-            return -1;
+        minusInput(array) {
+            return array.slice(0, 1);
         },
         
         
-        handleInputTypeChange(newArray, oldArray) {
-            for (let i = 0; i < newArray.length; i++) {
-                if (newArray[i] !== oldArray[i]) {
-                    console.log(`inputType[${i}] 發生變動，新值為 ${newArray[i]}`);
-                }
-            }
+        // 送出 (新增)
+        send() {
+            axios.post(this.addQuestionnaireContent,{"questionnaireContentList":this.questionnaireContentList}).then(response=>{
+                console.log(response.data.message)
+            })
         },
         
         
-        show() {
-            console.log(this.questionnaireContentList)
-        }
     },
     mounted() {
+        // 獲得所有題目
+        axios.post(this.findAllByQuestionnaireId, {"questionnaireId": this.id}).then(response => {
+            console.log(response.data)
+        })
+        
     },
+    watch: {
+        // 暫存
+        questionnaireContentList: {
+            handler() {
+                const temp = JSON.stringify(this.questionnaireContentList);
+                sessionStorage.setItem("questionnaireContentListObject", temp);
+            },
+            deep: true
+        },
+        optionArray: {
+            handler() {
+                this.questionnaireContentList.forEach((question, index) => {
+                    question.options = this.optionArray[index].join(';');
+                });
+            },
+            deep: true
+        }
+        
+    }
 }
 </script>
 
@@ -110,12 +136,15 @@ export default {
             <span v-if="questionnaireContentList[index].type !== 'text'"
                   @click="optionAmount[index] = plusOptionAmount(optionAmount[index])">＋</span>
             <span v-if="questionnaireContentList[index].type !== 'text'"
-                  @click="optionAmount[index] = minusOptionAmount(optionAmount[index])">－</span>
+                  @click="optionAmount[index] = minusOptionAmount(optionAmount[index]);
+                          optionArray[index] = minusInput(optionArray[index])">－</span>
             
             <!--  我是問題內容  -->
             <div class="option-block">
                 <label for="answer">回答</label>
-                <input v-for=" (n,index) in optionAmount[index]" :key="index" type="text">
+                <input v-for="(n, i) in optionAmount[index]" v-if="questionnaireContentList[index].type !== 'text'"
+                       :key="i" v-model="optionArray[index][i]" type="text">
+                <input v-else v-model="optionArray[index][0]" type="text">
             </div>
             
             <!--  我是問題類型  -->
@@ -138,8 +167,8 @@ export default {
             <span @click="questionAmount = plusQuestionAmount(questionAmount)">＋</span>
             <span @click="questionAmount = minusQuestionAmount(questionAmount)">－</span>
         </div>
+        <button type="button" @click="send">送出</button>
     </div>
-    <button @click="show">Console</button>
 </template>
 
 <style lang="scss" scoped>
