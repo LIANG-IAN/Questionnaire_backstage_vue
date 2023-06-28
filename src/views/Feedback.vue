@@ -9,11 +9,11 @@ export default {
             answerRecordList: null,
             
             
-            allByQuestionnaireIdFromAnswerRecordOrder: import.meta.env.VITE_FIND_ALL_BY_QUESTIONNAIRE_ID_FROM_ANSWER_RECORD_ORDER
+            findAllByQuestionnaireIdFromAnswerRecordOrder: import.meta.env.VITE_FIND_ALL_BY_QUESTIONNAIRE_ID_FROM_ANSWER_RECORD_ORDER
         }
     },
     mounted() {
-        axios.post(this.allByQuestionnaireIdFromAnswerRecordOrder, {"questionnaireId": this.id}).then(response => {
+        axios.post(this.findAllByQuestionnaireIdFromAnswerRecordOrder, {"questionnaireId": this.id}).then(response => {
             console.log(response.data)
             this.answerRecordList = response.data.answerRecordList
         })

@@ -10,11 +10,15 @@ export default {
             questionnaireContentList: [],
             optionArray: [],
             button: false,
-            answerContent: [],
+            answerContentArray: [],
             isEmpty: false,
+            checkboxArray:[],
+            
             
             findByQuestionnaireId: import.meta.env.VITE_FIND_BY_QUESTIONNAIRE_ID,
             findAllByQuestionnaireId: import.meta.env.VITE_FIND_ALL_BY_QUESTIONNAIRE_ID,
+            addUser: import.meta.env.VITE_ADD_USER,
+            addAnswerContent: import.meta.env.VITE_ADD_ANSWER_CONTENT
         }
     },
     mounted() {
@@ -30,7 +34,23 @@ export default {
                 this.optionArray.push(temp);
             })
             // console.log(this.questionnaireContentList)
-            // console.log(this.optionArray)
+            
+            for (let i = 0; i < this.questionnaireContentList.length; i++) {
+                const temp = {
+                    user: {
+                        id: 0
+                    },
+                    answer: "",
+                    questionnaire: {
+                        id: this.id
+                    },
+                    questionnaireContent: {
+                        id: this.questionnaireContentList[i].id
+                    }
+                }
+                this.answerContentArray.push(temp);
+            }
+            // console.log(this.answerContentArray)
         })
     },
     methods: {
@@ -51,27 +71,75 @@ export default {
             }
         },
         
-        setReadOnlyAndJudge() {
-            this.setReadOnly(1);
+        judge() {
             const elements = document.querySelectorAll(".necessary");
             const checkboxes = document.querySelectorAll(".necessaryCheckbox");
             for (let i = 0; i < elements.length; i++) {
-                if (elements[i].value.trim) {
-                    elements[i].classList.add("alert")
+                if (elements[i].value) {
+                    elements[i].classList.remove("alert")
+                    this.isEmpty = false;
                     continue;
                 }
-                elements[i].classList.remove("alert")
+                elements[i].classList.add("alert")
                 this.isEmpty = true;
-                break;
             }
             for (let i = 0; i < checkboxes.length; i++) {
                 if (checkboxes[i].checked) {
-                    checkboxes[i].classList.add("alert")
+                    checkboxes[i].parentElement.parentElement.parentElement.classList.remove("alert")
+                    this.isEmpty = false;
                     break;
                 }
-                checkboxes[i].classList.remove("alert")
+                checkboxes[i].parentElement.parentElement.parentElement.classList.add("alert")
                 this.isEmpty = true;
             }
+        },
+        
+        // 就是拿來塞方法的方法
+        confirm() {
+            this.setReadOnly(1);
+            this.judge();
+            this.getCheckbox();
+            // console.log(this.answerContentArray)
+        },
+        
+        getCheckbox(){
+            const checkedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            const groupedValues = {};
+            
+            checkedCheckboxes.forEach((checkbox) => {
+                const dataCheckbox = checkbox.getAttribute("data-checkbox");
+                const value = checkbox.value;
+                
+                if (dataCheckbox in groupedValues) {
+                    groupedValues[dataCheckbox].push(value);
+                } else {
+                    groupedValues[dataCheckbox] = [value];
+                }
+            });
+            this.answerContentArray.forEach((item, index) => {
+                if (index in groupedValues) {
+                    item.answer = groupedValues[index].join(';');
+                }
+            });
+        },
+        
+        
+        send() {
+            axios.post(this.addUser, {"user":this.user}).then(response=>{
+                const userId =response.data.id;
+                this.answerContentArray.forEach(answerContent=>{
+                    answerContent.user.id = userId;
+                })
+                
+                axios.post(this.addAnswerContent,{"answerContentList":this.answerContentArray}).then(response=>{
+                    console.log(this.answerContentArray);
+                    console.log(response.data.message);
+                    
+                    if (response.data.message === "新增成功"){
+                    
+                    }
+                })
+            })
         }
         
     },
@@ -118,12 +186,12 @@ export default {
                 <template v-for="(option,opIndex) in optionArray[quIndex]"
                           :key="opIndex">
                     <p>{{ option }}</p>
-                    <input :class="content.necessary ? 'necessary' : ''" required type="text">
+                    <input :class="content.necessary ? 'necessary' : ''" required type="text" v-model="answerContentArray[quIndex].answer">
                 </template>
             </div>
             
             <div v-else-if="content.type === 'select'" class="option-block">
-                <select :class="content.necessary ? 'necessary' : ''">
+                <select :class="content.necessary ? 'necessary' : ''" v-model="answerContentArray[quIndex].answer">
                     <template v-for="(option,opIndex) in optionArray[quIndex]"
                               :key="opIndex">
                         <option :value="option">{{ option }}</option>
@@ -134,16 +202,17 @@ export default {
             <div v-else-if="content.type === 'checkbox'" class="option-block">
                 <template v-for="(option,opIndex) in optionArray[quIndex]"
                           :key="opIndex">
-                    <label for="">{{ option }}
-                        <input id="" :class="content.necessary ? 'necessaryCheckbox' : ''" name="" type="checkbox">
+                    <label :for="option">{{ option }}
+                        <input :id="option" :class="content.necessary ? 'necessaryCheckbox' : ''" name=""
+                               type="checkbox" :value="option" :data-checkbox="quIndex">
                     </label>
                 </template>
             </div>
         </div>
         <div class="button-block">
             <button v-if="button" type="button" @click="setReadOnly(0)">修改</button>
-            <button v-if="button" :disabled="isEmpty" type="button">送出</button>
-            <button v-else type="button" @click="setReadOnlyAndJudge">確認</button>
+            <button v-if="button" :disabled="isEmpty" type="button" @click="send">送出</button>
+            <button v-else type="button" @click="confirm">確認</button>
         </div>
     </div>
 </template>
@@ -233,8 +302,8 @@ export default {
         }
     }
     
-    .alert{
-        box-shadow: 0 0 0 3px hotpink;
+    .alert {
+        box-shadow: 0 0 0 1px red;
     }
 }
 </style>
