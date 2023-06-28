@@ -4,6 +4,7 @@ export default {
   data() {
     return {
       selectedIndex: 0,
+        id:sessionStorage.getItem("id")
     }
   },
   methods: {
@@ -49,9 +50,9 @@ export default {
       <span :class="{ 'render-gray': selectedIndex === 1 }"
             @click="navigateTo('/backstage/topic'); selectTab(1)">問卷題目</span>
       <span :class="{ 'render-gray': selectedIndex === 2 }"
-            @click="navigateTo('/backstage/feedback'); selectTab(2)">問卷回饋</span>
+            @click="navigateTo('/backstage/feedback'); selectTab(2)" v-show="id !== null">問卷回饋</span>
       <span :class="{ 'render-gray': selectedIndex === 3 }"
-            @click="navigateTo('/backstage/statistics'); selectTab(3)">統計</span>
+            @click="navigateTo('/backstage/statistics'); selectTab(3)" v-show="id !== null">統計</span>
     </header>
     <div class="router-view">
       <RouterView/>
@@ -61,12 +62,9 @@ export default {
 
 <style lang="scss" scoped>
 .backstage {
-    display: flex;
-    flex-direction: column;
     width: 700px;
-    height: 700px;
-    border: 1px solid black;
-    
+    height: 100%;
+    overflow: auto;
     
     header {
         width: 400px;

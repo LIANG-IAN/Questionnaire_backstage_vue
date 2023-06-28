@@ -237,10 +237,15 @@ export default {
 .topic {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    height: 400px;
+    overflow: auto;
     
     .question-block {
+        padding-top: 20px;
+        padding-bottom: 10px;
+        margin: 0 10px;
+        border-bottom: 1px black dashed;
+        
         .option-block {
             display: flex;
             flex-direction: column;
