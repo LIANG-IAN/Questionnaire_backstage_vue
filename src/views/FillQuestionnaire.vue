@@ -10,6 +10,8 @@ export default {
             questionnaireContentList: [],
             optionArray: [],
             button: false,
+            answerContent: [],
+            isEmpty: false,
             
             findByQuestionnaireId: import.meta.env.VITE_FIND_BY_QUESTIONNAIRE_ID,
             findAllByQuestionnaireId: import.meta.env.VITE_FIND_ALL_BY_QUESTIONNAIRE_ID,
@@ -18,7 +20,7 @@ export default {
     mounted() {
         axios.post(this.findByQuestionnaireId, {"id": this.id}).then(response => {
             this.questionnaire = response.data.questionnaire
-            console.log(this.questionnaire)
+            // console.log(this.questionnaire)
         })
         
         axios.post(this.findAllByQuestionnaireId, {"questionnaireId": this.id}).then(response => {
@@ -27,8 +29,8 @@ export default {
                 const temp = questionnaireContent.options.split(";")
                 this.optionArray.push(temp);
             })
-            console.log(this.questionnaireContentList)
-            console.log(this.optionArray)
+            // console.log(this.questionnaireContentList)
+            // console.log(this.optionArray)
         })
     },
     methods: {
@@ -47,7 +49,31 @@ export default {
                 });
                 this.button = true;
             }
+        },
+        
+        setReadOnlyAndJudge() {
+            this.setReadOnly(1);
+            const elements = document.querySelectorAll(".necessary");
+            const checkboxes = document.querySelectorAll(".necessaryCheckbox");
+            for (let i = 0; i < elements.length; i++) {
+                if (elements[i].value.trim) {
+                    elements[i].classList.add("alert")
+                    continue;
+                }
+                elements[i].classList.remove("alert")
+                this.isEmpty = true;
+                break;
+            }
+            for (let i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].checked) {
+                    checkboxes[i].classList.add("alert")
+                    break;
+                }
+                checkboxes[i].classList.remove("alert")
+                this.isEmpty = true;
+            }
         }
+        
     },
 }
 </script>
@@ -66,22 +92,22 @@ export default {
         <div class="user-info">
             <div class="input-row">
                 <label for="name">姓名</label>
-                <input id="name" v-model="user.name" type="text">
+                <input id="name" v-model.trim="user.name" class="necessary" type="text">
             </div>
             
             <div class="input-row">
                 <label for="tel">電話號碼</label>
-                <input id="tel" v-model="user.tel" type="tel">
+                <input id="tel" v-model.trim="user.tel" class="necessary" type="tel">
             </div>
             
             <div class="input-row">
                 <label for="email">Email</label>
-                <input id="email" v-model="user.email" type="email">
+                <input id="email" v-model.trim="user.email" class="necessary" type="email">
             </div>
             
             <div class="input-row">
                 <label for="age">年齡</label>
-                <input id="age" v-model="user.age" type="number">
+                <input id="age" v-model.trim="user.age" class="necessary" type="number">
             </div>
         </div>
         <div v-for="(content,quIndex) in questionnaireContentList" :key="quIndex" class="question-block">
@@ -92,15 +118,15 @@ export default {
                 <template v-for="(option,opIndex) in optionArray[quIndex]"
                           :key="opIndex">
                     <p>{{ option }}</p>
-                    <input required type="text">
+                    <input :class="content.necessary ? 'necessary' : ''" required type="text">
                 </template>
             </div>
             
             <div v-else-if="content.type === 'select'" class="option-block">
-                <select>
+                <select :class="content.necessary ? 'necessary' : ''">
                     <template v-for="(option,opIndex) in optionArray[quIndex]"
                               :key="opIndex">
-                        <option value="">{{ option }}</option>
+                        <option :value="option">{{ option }}</option>
                     </template>
                 </select>
             </div>
@@ -109,15 +135,15 @@ export default {
                 <template v-for="(option,opIndex) in optionArray[quIndex]"
                           :key="opIndex">
                     <label for="">{{ option }}
-                        <input id="" name="" type="checkbox">
+                        <input id="" :class="content.necessary ? 'necessaryCheckbox' : ''" name="" type="checkbox">
                     </label>
                 </template>
             </div>
         </div>
         <div class="button-block">
             <button v-if="button" type="button" @click="setReadOnly(0)">修改</button>
-            <button v-if="button" type="button">送出</button>
-            <button v-else type="button" @click="setReadOnly(1)">確認</button>
+            <button v-if="button" :disabled="isEmpty" type="button">送出</button>
+            <button v-else type="button" @click="setReadOnlyAndJudge">確認</button>
         </div>
     </div>
 </template>
@@ -205,6 +231,10 @@ export default {
             padding: 10px;
             margin: 10px;
         }
+    }
+    
+    .alert{
+        box-shadow: 0 0 0 3px hotpink;
     }
 }
 </style>
