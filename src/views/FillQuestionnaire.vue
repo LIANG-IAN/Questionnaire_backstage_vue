@@ -1,5 +1,6 @@
 <script>
 import axios from "axios";
+import dayjs from 'dayjs'
 
 export default {
     data() {
@@ -18,7 +19,8 @@ export default {
             findByQuestionnaireId: import.meta.env.VITE_FIND_BY_QUESTIONNAIRE_ID,
             findAllByQuestionnaireId: import.meta.env.VITE_FIND_ALL_BY_QUESTIONNAIRE_ID,
             addUser: import.meta.env.VITE_ADD_USER,
-            addAnswerContent: import.meta.env.VITE_ADD_ANSWER_CONTENT
+            addAnswerContent: import.meta.env.VITE_ADD_ANSWER_CONTENT,
+            addAnswerRecord: import.meta.env.VITE_ADD_ANSWER_RECORD
         }
     },
     mounted() {
@@ -132,11 +134,27 @@ export default {
                 })
                 
                 axios.post(this.addAnswerContent,{"answerContentList":this.answerContentArray}).then(response=>{
-                    console.log(this.answerContentArray);
-                    console.log(response.data.message);
+                    // console.log(this.answerContentArray);
+                    // console.log(response.data.message);
                     
                     if (response.data.message === "新增成功"){
-                    
+                        const currentDate = dayjs();
+                        const localDateTimeString = currentDate.format("YYYY-MM-DDTHH:mm:ss");
+                       
+                        const body = {
+                            answerRecord: {
+                                user: {
+                                    id: userId
+                                },
+                                questionnaire: {
+                                    id: this.id
+                                },
+                                fillingTime:localDateTimeString
+                            }
+                        }
+                        axios.post(this.addAnswerRecord,body).then(response=>{
+                            console.log(response.data.message);
+                        })
                     }
                 })
             })

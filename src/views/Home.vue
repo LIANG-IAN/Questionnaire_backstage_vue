@@ -11,7 +11,10 @@ export default {
       }
       this.$router.push("/Overview")
     }
-  }
+  },
+    mounted() {
+      sessionStorage.clear();
+    }
 }
 </script>
 
@@ -23,5 +26,10 @@ export default {
 </template>
 
 <style scoped lang="scss">
-
+.home{
+    button{
+        padding: 20px;
+        margin: 20px;
+    }
+}
 </style>
