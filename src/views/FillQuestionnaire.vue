@@ -13,7 +13,7 @@ export default {
             button: false,
             answerContentArray: [],
             isEmpty: false,
-            checkboxArray:[],
+            checkboxArray: [],
             
             
             findByQuestionnaireId: import.meta.env.VITE_FIND_BY_QUESTIONNAIRE_ID,
@@ -73,6 +73,7 @@ export default {
             }
         },
         
+        
         judge() {
             const elements = document.querySelectorAll(".necessary");
             const checkboxes = document.querySelectorAll(".necessaryCheckbox");
@@ -96,6 +97,7 @@ export default {
             }
         },
         
+        
         // 就是拿來塞方法的方法
         confirm() {
             this.setReadOnly(1);
@@ -104,7 +106,8 @@ export default {
             // console.log(this.answerContentArray)
         },
         
-        getCheckbox(){
+        
+        getCheckbox() {
             const checkedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
             const groupedValues = {};
             
@@ -114,7 +117,8 @@ export default {
                 
                 if (dataCheckbox in groupedValues) {
                     groupedValues[dataCheckbox].push(value);
-                } else {
+                }
+                else {
                     groupedValues[dataCheckbox] = [value];
                 }
             });
@@ -127,20 +131,19 @@ export default {
         
         
         send() {
-            axios.post(this.addUser, {"user":this.user}).then(response=>{
-                const userId =response.data.id;
-                this.answerContentArray.forEach(answerContent=>{
+            axios.post(this.addUser, {"user": this.user}).then(response => {
+                const userId = response.data.id;
+                this.answerContentArray.forEach(answerContent => {
                     answerContent.user.id = userId;
                 })
                 
-                axios.post(this.addAnswerContent,{"answerContentList":this.answerContentArray}).then(response=>{
-                    // console.log(this.answerContentArray);
-                    // console.log(response.data.message);
+                axios.post(this.addAnswerContent, {"answerContentList": this.answerContentArray}).then(response => {
+                    alert(response.data.message)
                     
-                    if (response.data.message === "新增成功"){
+                    if (response.data.message === "新增成功") {
                         const currentDate = dayjs();
                         const localDateTimeString = currentDate.format("YYYY-MM-DDTHH:mm:ss");
-                       
+                        
                         const body = {
                             answerRecord: {
                                 user: {
@@ -149,10 +152,10 @@ export default {
                                 questionnaire: {
                                     id: this.id
                                 },
-                                fillingTime:localDateTimeString
+                                fillingTime: localDateTimeString
                             }
                         }
-                        axios.post(this.addAnswerRecord,body).then(response=>{
+                        axios.post(this.addAnswerRecord, body).then(response => {
                             console.log(response.data.message);
                         })
                     }
@@ -196,20 +199,22 @@ export default {
                 <input id="age" v-model.trim="user.age" class="necessary" type="number">
             </div>
         </div>
+        
         <div v-for="(content,quIndex) in questionnaireContentList" :key="quIndex" class="question-block">
             <span v-if="content.necessary">❗</span>
-            <p>{{ content.question }}</p>
-            
+            <fieldset>
+                <legend>{{ content.question }}</legend>
             <div v-if="content.type === 'text'" class="option-block">
                 <template v-for="(option,opIndex) in optionArray[quIndex]"
                           :key="opIndex">
                     <p>{{ option }}</p>
-                    <input :class="content.necessary ? 'necessary' : ''" required type="text" v-model="answerContentArray[quIndex].answer">
+                    <input v-model="answerContentArray[quIndex].answer" :class="content.necessary ? 'necessary' : ''" required
+                           type="text">
                 </template>
             </div>
             
             <div v-else-if="content.type === 'select'" class="option-block">
-                <select :class="content.necessary ? 'necessary' : ''" v-model="answerContentArray[quIndex].answer">
+                <select v-model="answerContentArray[quIndex].answer" :class="content.necessary ? 'necessary' : ''">
                     <template v-for="(option,opIndex) in optionArray[quIndex]"
                               :key="opIndex">
                         <option :value="option">{{ option }}</option>
@@ -221,11 +226,12 @@ export default {
                 <template v-for="(option,opIndex) in optionArray[quIndex]"
                           :key="opIndex">
                     <label :for="option">{{ option }}
-                        <input :id="option" :class="content.necessary ? 'necessaryCheckbox' : ''" name=""
-                               type="checkbox" :value="option" :data-checkbox="quIndex">
+                        <input :id="option" :class="content.necessary ? 'necessaryCheckbox' : ''" :data-checkbox="quIndex"
+                               :value="option" name="" type="checkbox">
                     </label>
                 </template>
             </div>
+            </fieldset>
         </div>
         <div class="button-block">
             <button v-if="button" type="button" @click="setReadOnly(0)">修改</button>
@@ -253,7 +259,7 @@ export default {
     
     .title {
         font-size: 40px;
-        line-height: 80px;
+        line-height: 40px;
     }
     
     .main-point {
@@ -263,6 +269,10 @@ export default {
     
     .user-info {
         width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 20px;
         
         .input-row {
             display: flex;
@@ -270,7 +280,6 @@ export default {
             width: 40%;
             margin-bottom: 10px;
             align-items: center;
-            
             
             label {
                 margin-right: 10px;
@@ -289,28 +298,26 @@ export default {
     .question-block {
         margin: 15px;
         font-size: 18px;
+        width: 100%;
+        text-align: center;
+        line-height: 25px;
+        position: relative;
         
-        span {
-            font-size: 10px;
-            line-height: 20px;
+        span{
+            position: absolute;
+            top: -15px;
+            left: 5px;
         }
         
-        label {
-            margin-right: 10px;
-        }
-        
-        input {
-            margin-top: 10px;
-            font-size: 18px;
-            margin-left: 0; //覆蓋原生
+        fieldset{
+            border: black 1px solid;
             
+            legend{
+                text-align: left;
+                padding: 0 10px;
+            }
         }
         
-        select {
-            margin-top: 10px;
-            font-size: 18px;
-            
-        }
     }
     
     .button-block {

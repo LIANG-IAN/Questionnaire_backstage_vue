@@ -81,7 +81,6 @@ export default {
         
         delete() {
             axios.post(this.deleteQuestionnaireContent, {"idList": this.deletedQuestionIds}).then(response => {
-                alert("刪除的: "+response.data.message);
             })
         },
         
@@ -198,38 +197,54 @@ export default {
     <div class="topic">
         <div v-for="(question, index) in questionnaireContentList" :key="index" class="question-block">
             <!-- 我是問題題目 -->
-            <label :for="'question-' + index">問題</label>
-            <input :id="`question-` + index" v-model="question.question" type="text"/>
+            <div class="question">
+                <label :for="'question-' + index">問題
+                <input :id="`question-` + index" v-model="question.question" type="text"/>
+                </label>
+            </div>
             
             <!-- 是否必須 -->
-            <label :for="'necessary-' + index">必須</label>
-            <input :id="'necessary-' + index" v-model="question.necessary" type="checkbox"/>
+            <div class="necessary-block">
+                <label :for="'necessary-' + index">必須
+                <input :id="'necessary-' + index" v-model="question.necessary" type="checkbox"/>
+            </label>
+            </div>
             
             <!-- 我是加加、減減 -->
-            <span v-if="question.type !== 'text'" @click="optionAmount[index] = plusOptionAmount(index)">＋</span>
-            <span v-if="question.type !== 'text'" @click="optionAmount[index] = minusOptionAmount(index)">－</span>
+            <div class="symbol-block">
+                <span v-if="question.type !== 'text'" @click="optionAmount[index] = plusOptionAmount(index)" class="plus">＋</span>
+                <span v-if="question.type !== 'text'"
+                      @click="optionAmount[index] = minusOptionAmount(index)" class="minus">－</span>
+            </div>
             
             <!-- 我是問題內容 -->
             <div class="option-block">
                 <label :for="'answer'+index">回答</label>
-                <input v-for="(option, optionIndex) in optionArray[index]" v-if="question.type !== 'text'"
-                       :key="optionIndex" v-model="optionArray[index][optionIndex]" type="text"/>
+                    <div>
+                        <input v-for="(option, optionIndex) in optionArray[index]" v-if="question.type !== 'text'"
+                              :key="optionIndex" v-model="optionArray[index][optionIndex]" type="text"/>
+                    </div>
+                
             </div>
             
             <!-- 我是問題類型 -->
-            <select v-model="question.type">
-                <option value="text">簡答</option>
-                <option value="select">選擇題</option>
-                <option value="checkbox">核取方塊</option>
-            </select>
+            <div class="select-block">
+                <select v-model="question.type">
+                    <option value="text">簡答</option>
+                    <option value="select">選擇題</option>
+                    <option value="checkbox">核取方塊</option>
+                </select>
+            </div>
         </div>
         
         <!-- 我是加加、減減 -->
         <div class="symbol">
-            <span @click="questionAmount = plusQuestionAmount(questionAmount)">＋</span>
-            <span @click="questionAmount = minusQuestionAmount(questionAmount)">－</span>
+            <span @click="questionAmount = plusQuestionAmount(questionAmount)" class="plus">＋</span>
+            <span @click="questionAmount = minusQuestionAmount(questionAmount)" class="minus">－</span>
         </div>
-        <button type="button" @click="sendAndDelete">送出</button>
+        <div class="send">
+            <button type="button" @click="sendAndDelete">送出</button>
+        </div>
     </div>
 </template>
 
@@ -237,19 +252,98 @@ export default {
 .topic {
     display: flex;
     flex-direction: column;
-    height: 400px;
+    justify-content: start;
+    height: 600px;
     overflow: auto;
+    padding-top: 20px;
     
     .question-block {
-        padding-top: 20px;
-        padding-bottom: 10px;
-        margin: 0 10px;
+        padding: 0 0 10px 0;
+        margin: 0 20px 0 20px;
         border-bottom: 1px black dashed;
         
-        .option-block {
-            display: flex;
-            flex-direction: column;
+        .question{
+            padding-top: 15px;
+        }
+        
+        .option-block{
+            
+            input{
+                margin-top: 10px;
+            }
+        }
+        
+        .necessary-block{
+            padding-top: 15px;
+        }
+        
+        .symbol-block{
+            padding-top: 5px;
+            height: 20px;
+            font-weight: bold;
+            
+            .plus{
+                color: #99C24D;
+                display: inline-block;
+                
+                &:hover{
+                    color: green;
+                    scale: 1.2;
+                }
+            }
+            
+            .minus{
+                color: #F18F01;
+                display: inline-block;
+                
+                &:hover{
+                    color: red;
+                    scale: 1.2;
+                }
+            }
+        }
+        
+        .select-block{
+            padding-top: 15px;
+        }
+        
+    }
+    
+    .symbol{
+        padding-top: 10px;
+        padding-left:20px ;
+        font-weight: bold;
+        font-size: 18px;
+        
+        .plus{
+            color: #99C24D;
+            display: inline-block;
+            
+            &:hover{
+                color: green;
+                scale: 1.2;
+            }
+        }
+        
+        .minus{
+            color: #F18F01;
+            display: inline-block;
+            
+            &:hover{
+                color: red;
+                scale: 1.2;
+            }
         }
     }
+    
+    .send {
+        text-align: center;
+        
+        button {
+            width: 200px;
+            margin-bottom: 50px;
+        }
+    }
+    
 }
 </style>

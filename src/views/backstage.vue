@@ -62,9 +62,11 @@ export default {
 
 <style lang="scss" scoped>
 .backstage {
-    width: 700px;
+    width: 800px;
     height: 100%;
-    overflow: auto;
+    border-radius: 10px 10px 0 0;
+    padding-top: 25px;
+    color: white;
     
     header {
         width: 400px;
@@ -72,21 +74,26 @@ export default {
         display: flex;
         justify-content: space-between;
         background-color: grey;
+        border-radius: 10px 10px 0 0;
         
         span {
             flex: 1;
             text-align: center;
             border-radius: 10px 10px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .render-gray {
-            background-color: #f3d26f;
+            background-color: #2E4057;
         }
     }
     
     .router-view {
         flex-grow: 1;
-        background-color: #f3d26f;
+        background-color: #2E4057;
+        border-radius: 0 0 10px 10px;
     }
 }
 </style>

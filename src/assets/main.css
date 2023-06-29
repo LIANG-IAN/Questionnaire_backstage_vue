@@ -2,6 +2,7 @@
    v2.0 | 20110126
    License: none (public domain)
 */
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300&display=swap");
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -9,7 +10,7 @@ del, dfn, em, img, ins, kbd, q, s, samp,
 small, strike, strong, sub, sup, tt, var,
 b, u, i, center,
 dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
+form, label,
 table, caption, tbody, tfoot, thead, tr, th, td,
 article, aside, canvas, details, embed,
 figure, figcaption, footer, header, hgroup,
@@ -51,6 +52,48 @@ q:before, q:after {
 table {
   border-collapse: collapse;
   border-spacing: 0;
+}
+
+body {
+  background-color: #B1DDF1;
+  font-family: "Noto Sans TC", sans-serif;
+}
+
+* {
+  font-size: 16px;
+}
+
+a {
+  color: white;
+}
+
+button {
+  background-color: #2F2D2E;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+  border-radius: 10px;
+  box-shadow: #048BA8 5px 5px;
+}
+button:hover {
+  scale: 1.1;
+}
+button:active {
+  scale: 1;
+}
+
+input {
+  margin: 0 10px;
+  border-radius: 5px;
+  border: none;
+  outline: none;
+  padding: 5px;
+  text-align: center;
+}
+
+input[type=text] {
+  width: 200px;
 }
 
 /*# sourceMappingURL=main.css.map */

@@ -71,21 +71,30 @@ export default {
 <template>
     <div class="questionnaire-manage">
         <div class="container">
-            <label for="name">問卷名稱</label>
-            <input id="name" v-model.trim="questionnaire.questionnaire" type="text">
+            <div class="box">
+                <label for="name">問卷名稱</label>
+                <input id="name" v-model.trim="questionnaire.questionnaire" type="text">
+            </div>
             
-            <label for="content">描述內容</label>
-            <input id="content" v-model.trim="questionnaire.mainPoint" type="text">
+            <div class="box">
+                <label for="content">描述內容</label>
+                <input id="content" v-model.trim="questionnaire.mainPoint" type="text">
+            </div>
             
-            <label for="starting-time">開始時間</label>
-            <input id="starting-time" v-model="questionnaire.startingTime" type="date">
+            <div class="box">
+                <label for="starting-time">開始時間</label>
+                <input id="starting-time" v-model="questionnaire.startingTime" type="date">
+            </div>
             
-            <label for="end-time">結束時間</label>
-            <input id="end-time" v-model="questionnaire.endTime" type="date"></div>
-    
-    
-    <button v-if="this.id !== null" type="button" @click="update(questionnaire)">更新</button>
-    <button v-else type="button" @click="send(questionnaire)">送出</button>
+            <div class="box">
+                <label for="end-time">結束時間</label>
+                <input id="end-time" v-model="questionnaire.endTime" type="date">
+            </div>
+        </div>
+        
+        
+        <button v-if="this.id !== null" type="button" @click="update(questionnaire)">更新</button>
+        <button v-else type="button" @click="send(questionnaire)">送出</button>
     </div>
 </template>
 
@@ -93,12 +102,23 @@ export default {
 .questionnaire-manage {
     display: flex;
     flex-direction: column;
-    height: 400px;
+    height: 600px;
     
-    .container{
+    button{
+        width: 200px;
+        margin-bottom: 50px;
+        margin-left: 300px;
+    }
+    .container {
         display: flex;
         flex-direction: column;
-        margin: 0 10px;
+        height: 100%;
+        margin: 0 10px 0 30px;
+        padding: 20px 0;
+        
+        .box{
+        padding-bottom: 50px;
+        }
     }
 }
 </style>
