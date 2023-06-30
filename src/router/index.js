@@ -50,8 +50,11 @@ const router = createRouter({
                 {
                     path: 'statistics',
                     component: () => import("../views/Statistics.vue")
-                },{
-                    path: 'detail',
+                },
+                {
+                    path: 'detail/:userId',
+                    name:'detail',
+                    props:true,
                     component: () => import("../views/Detail.vue")
                 },
             ]

@@ -53,7 +53,13 @@ export default {
                 this.id = response.data.questionnaire.id;
                 sessionStorage.setItem("id", this.id)
             })
-        }
+        },
+        
+        //檢查結束時間
+        checkEndTime(){
+           
+           }
+        
     },
     watch: {
         // 暫存
@@ -88,7 +94,7 @@ export default {
             
             <div class="box">
                 <label for="end-time">結束時間</label>
-                <input id="end-time" v-model="questionnaire.endTime" type="date">
+                <input id="end-time" v-model="questionnaire.endTime" type="date" @blur="checkEndTime">
             </div>
         </div>
         

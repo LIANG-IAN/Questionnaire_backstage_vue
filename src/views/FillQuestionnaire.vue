@@ -161,8 +161,14 @@ export default {
                     }
                 })
             })
-        }
+        },
         
+        
+        checkNum(){
+            if (this.user.age < 0){
+                this.user.age = null;
+            }
+        }
     },
 }
 </script>
@@ -196,7 +202,7 @@ export default {
             
             <div class="input-row">
                 <label for="age">年齡</label>
-                <input id="age" v-model.trim="user.age" class="necessary" type="number">
+                <input id="age" v-model.trim="user.age" class="necessary" type="number" min="0" @blur="checkNum">
             </div>
         </div>
         
@@ -208,8 +214,7 @@ export default {
                 <template v-for="(option,opIndex) in optionArray[quIndex]"
                           :key="opIndex">
                     <p>{{ option }}</p>
-                    <input v-model="answerContentArray[quIndex].answer" :class="content.necessary ? 'necessary' : ''" required
-                           type="text">
+                    <input v-model="answerContentArray[quIndex].answer" :class="content.necessary ? 'necessary' : ''" required type="text">
                 </template>
             </div>
             
@@ -238,12 +243,12 @@ export default {
             <button v-if="button" :disabled="isEmpty" type="button" @click="send">送出</button>
             <button v-else type="button" @click="confirm">確認</button>
         </div>
+        <button type="button" class="roll-back"><RouterLink to="/overview">回上一頁</RouterLink></button>
     </div>
 </template>
 
 <style lang="scss" scoped>
 .fill-questionnaire {
-    
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -251,6 +256,7 @@ export default {
     width: 50%;
     padding: 30px 0;
     box-sizing: border-box;
+    position: relative;
     
     .time {
         width: 100%;
@@ -329,6 +335,12 @@ export default {
     
     .alert {
         box-shadow: 0 0 0 1px red;
+    }
+    
+    .roll-back{
+        position: fixed;
+        right: 150px;
+        bottom: 50px;
     }
 }
 </style>

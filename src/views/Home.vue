@@ -78,6 +78,12 @@ export default {
         margin: 20px;
     }
     
+    .pinia{
+        img{
+            -webkit-filter: drop-shadow(10px 10px 4px #6c6c6c);
+        }
+    }
+    
     .control2 {
         position: absolute;
         top: 360px;
@@ -99,8 +105,8 @@ export default {
         height: 30px;
         background-color: black;
         border-radius: 50%;
-        top: 25%;
-        left: 25%;
+        top: 20%;
+        left: 20%;
         transform: translate(-50%, -50%);
     }
     
@@ -125,8 +131,8 @@ export default {
         height: 30px;
         background-color: black;
         border-radius: 50%;
-        top: 25%;
-        left: 25%;
+        top: 20%;
+        left: 20%;
         transform: translate(-50%, -50%);
     }
     

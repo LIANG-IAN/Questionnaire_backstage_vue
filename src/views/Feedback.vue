@@ -13,8 +13,9 @@ export default {
         }
     },
     mounted() {
+        this.clearSession();
+        
         axios.post(this.findAllByQuestionnaireIdFromAnswerRecordOrder, {"questionnaireId": this.id}).then(response => {
-            console.log(response.data)
             this.answerRecordList = response.data.answerRecordList
         })
     },
@@ -22,6 +23,18 @@ export default {
         setSession(id,time){
             sessionStorage.setItem("userId",id);
             sessionStorage.setItem("fillingTime",time);
+            
+            this.$router.push({
+                name:"detail",
+                params:{
+                    userId:id
+                }
+            })
+        },
+        
+        clearSession(){
+            sessionStorage.removeItem("userId");
+            sessionStorage.removeItem("fillingTime");
         }
     }
     
@@ -44,8 +57,8 @@ export default {
                 <tr v-for="answerRecord in answerRecordList">
                     <td>{{ answerRecord.id }}</td>
                     <td>{{ answerRecord.user.name }}</td>
-                    <td>{{ answerRecord.fillingTime }}</td>
-                    <td @click="setSession(answerRecord.user.id,answerRecord.fillingTime)"><RouterLink to="/backstage/detail">細節</RouterLink></td>
+                    <td>{{ answerRecord.fillingTime.replace("T"," ") }}</td>
+                    <td @click="setSession(answerRecord.user.id,answerRecord.fillingTime)">細節</td>
                 </tr>
                 </tbody>
             </table>

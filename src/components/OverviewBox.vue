@@ -87,6 +87,13 @@ export default {
         // 清除 sessionStorage
         removeSession(item) {
             sessionStorage.removeItem(item);
+        },
+        
+        // 計算頁數
+        calculatePageTotal() {
+            let dataTotal = this.questionnaireList.length;
+            const perPage = 10;
+            this.pageTotal = Math.ceil(dataTotal / perPage);
         }
     },
     async mounted() {
@@ -104,10 +111,7 @@ export default {
         this.$watch(() => store.searchQuestionnaireFuzzyResult, this.updateQuestionnaireList);
         
         
-        // 計算頁數
-        const dataTotal = this.questionnaireList.length;
-        const perPage = 10;
-        this.pageTotal = Math.ceil(dataTotal / perPage);
+        this.calculatePageTotal();
     },
     computed: {
         // 管理員與否，決定路徑
@@ -115,6 +119,14 @@ export default {
             return this.identity === "true" ? "/backstage" : "/fillQuestionnaire";
         },
         
+    },
+    watch: {
+        questionnaireList: {
+            immediate: true, // 立即觸發一次計算
+            handler() {
+                this.calculatePageTotal();
+            }
+        }
     }
 }
 </script>

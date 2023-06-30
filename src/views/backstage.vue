@@ -56,6 +56,7 @@ export default {
     </header>
     <div class="router-view">
       <RouterView/>
+        <button type="button" class="roll-back" @click="navigateTo('/Overview')">回總覽</button>
     </div>
   </div>
 </template>
@@ -94,6 +95,13 @@ export default {
         flex-grow: 1;
         background-color: #2E4057;
         border-radius: 0 0 10px 10px;
+        position: relative;
+        
+        .roll-back{
+        position: fixed;
+            right: 150px;
+            bottom: 50px;
+        }
     }
 }
 </style>

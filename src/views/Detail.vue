@@ -3,14 +3,20 @@
 import axios from "axios";
 
 export default {
+    props:["userId"],
     data() {
         return {
             id: sessionStorage.getItem("id"),
             questionnaire: {},
             questionnaireContentList: [],
             optionArray: [],
-            user: {},
-            userId: sessionStorage.getItem("userId"),
+            user: {
+                name:"",
+                tel:"",
+                email:"",
+                age:""
+            },
+            // userId: sessionStorage.getItem("userId"),
             fillingTime: sessionStorage.getItem("fillingTime"),
             userAnswers: [],
             
@@ -21,8 +27,23 @@ export default {
             findByUserIdAndQuestionnaireId: import.meta.env.VITE_FIND_BY_USER_ID_AND_QUESTIONNAIRE_ID,
         }
     },
+    updated() {
+        console.log("update");
+        console.log(this.user)
+    },
     mounted: function () {
-        this.fillingTime = this.fillingTime.replace("T", " ")
+        if (!this.user) {
+            this.user = {
+                name: "",
+                tel: "",
+                email: "",
+                age: ""
+            };
+        }
+        
+        if (this.fillingTime) {
+            this.fillingTime = this.fillingTime.replace("T", " ");
+        }
         
         axios.post(this.findByQuestionnaireId, {"id": this.id}).then(response => {
             this.questionnaire = response.data.questionnaire
@@ -36,9 +57,13 @@ export default {
             })
         })
         
-        axios.post(this.findByUserId, {"id": this.userId}).then(response => {
-            this.user = response.data.user;
-        })
+        console.log(this.userId+"Api外面")
+        
+            axios.post(this.findByUserId, {"id": this.userId}).then(response => {
+                console.log("Api裡面")
+                this.user = response.data.user;
+            })
+        
         
         axios.post(this.findByUserIdAndQuestionnaireId, {
             "userId": this.userId,
@@ -51,7 +76,6 @@ export default {
     methods: {
         getUserAnswer(questionId) {
             const userAnswer = this.userAnswers.find(answer => answer.questionnaireContent.id === questionId);
-            console.log(userAnswer)
             return userAnswer ? userAnswer.answer : '';
         },
         isCheckboxChecked(questionId, option) {
@@ -87,7 +111,7 @@ export default {
         <div class="user-info">
             <div class="input-row">
                 <label for="name">姓名</label>
-                <input id="name" v-model.trim="user.name" class="necessary" readonly type="text">
+                <input id="name" v-model="user.name" class="necessary" readonly type="text">
             </div>
             
             <div class="input-row">
@@ -118,7 +142,8 @@ export default {
             
             <div v-else-if="content.type === 'select'" class="option-block">
                 <template v-for="(option, opIndex) in optionArray[quIndex]" :key="opIndex">
-                    <input :id="opIndex" :checked="getUserAnswer(content.id) === option" :data-question-id="content.id" :name="content.question" :value="option"
+                    <input :id="opIndex" :checked="getUserAnswer(content.id) === option" :data-question-id="content.id"
+                           :name="content.question" :value="option"
                            disabled="disabled" type="radio">
                     <label :for="opIndex">{{ option }}</label>
                 </template>
@@ -127,7 +152,8 @@ export default {
             <div v-else-if="content.type === 'checkbox'" class="option-block">
                 <template v-for="(option, opIndex) in optionArray[quIndex]" :key="opIndex">
                     <label :for="option">{{ option }}
-                        <input :id="option" :checked="isCheckboxChecked(content.id, option)" :data-checkbox="quIndex" :data-question-id="content.id" :value="option"
+                        <input :id="option" :checked="isCheckboxChecked(content.id, option)" :data-checkbox="quIndex"
+                               :data-question-id="content.id" :value="option"
                                disabled="disabled" type="checkbox">
                     </label>
                 </template>
@@ -212,6 +238,7 @@ export default {
         }
     }
 }
+
 input[type='radio']:after {
     width: 10px;
     height: 10px;
