@@ -7,7 +7,7 @@ export default {
         return {
             id: sessionStorage.getItem("id"),
             answerRecordList: null,
-            userId:0,
+            userId: 0,
             
             findAllByQuestionnaireIdFromAnswerRecordOrder: import.meta.env.VITE_FIND_ALL_BY_QUESTIONNAIRE_ID_FROM_ANSWER_RECORD_ORDER
         }
@@ -19,20 +19,20 @@ export default {
             this.answerRecordList = response.data.answerRecordList
         })
     },
-    methods:{
-        setSession(id,time){
-            sessionStorage.setItem("userId",id);
-            sessionStorage.setItem("fillingTime",time);
+    methods: {
+        setSession(id, time) {
+            sessionStorage.setItem("userId", id);
+            sessionStorage.setItem("fillingTime", time);
             
             this.$router.push({
-                name:"detail",
-                params:{
-                    userId:id
+                name: "detail",
+                params: {
+                    userId: id
                 }
             })
         },
         
-        clearSession(){
+        clearSession() {
             sessionStorage.removeItem("userId");
             sessionStorage.removeItem("fillingTime");
         }
@@ -57,8 +57,8 @@ export default {
                 <tr v-for="answerRecord in answerRecordList">
                     <td>{{ answerRecord.id }}</td>
                     <td>{{ answerRecord.user.name }}</td>
-                    <td>{{ answerRecord.fillingTime.replace("T"," ") }}</td>
-                    <td @click="setSession(answerRecord.user.id,answerRecord.fillingTime)">細節</td>
+                    <td>{{ answerRecord.fillingTime.replace("T", " ") }}</td>
+                    <td class="detail" @click="setSession(answerRecord.user.id,answerRecord.fillingTime)">細節</td>
                 </tr>
                 </tbody>
             </table>
@@ -80,24 +80,28 @@ export default {
         overflow: auto;
         line-height: 25px;
         font-size: 18px;
-    
-    table {
-        width: 100%;
-        text-align: center;
-        background-color: #2e4057;
         
-        
-        thead {
+        table {
+            width: 100%;
+            text-align: center;
+            background-color: #2e4057;
             
-            th {
-                width: 25%;
-                background-color: #989898; /* 添加背景色 */
-                position: sticky;
-                top: 0;
-                border-top: white 1px solid;
+            .detail{
+                cursor: pointer;
             }
+            
+            thead {
+                
+                th {
+                    width: 25%;
+                    background-color: #989898; /* 添加背景色 */
+                    position: sticky;
+                    top: 0;
+                    border-top: white 1px solid;
+                }
+            }
+            
         }
-    }
     }
 }
 </style>

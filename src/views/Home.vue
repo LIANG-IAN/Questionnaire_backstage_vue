@@ -55,14 +55,19 @@ export default {
         </div>
         <div class="control2">
             <div class="eye2">
-                <div class="pupil2"></div>
+                <div class="pupil2">
+                    <div class="water1" >
+                    </div>
+                </div>
             </div>
         </div>
         <div class="control1">
             <div class="eye1">
-                <div class="pupil1"></div>
+                <div class="pupil1"><div class="water1" >
+                </div></div>
             </div>
         </div>
+        
     </div>
 </template>
 
@@ -137,4 +142,16 @@ export default {
     }
     
 }
+
+.water1{
+    content: '';
+    position: absolute;
+    top: 25%;
+    left: 25%;
+    width: 13px;
+    height: 13px;
+    background-color: white;
+    border-radius: 50%;
+}
+
 </style>
