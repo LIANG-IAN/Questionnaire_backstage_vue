@@ -183,7 +183,7 @@ export default {
                     
                     <!--   是否渲染 router-link   -->
                     <td v-if="getState(questionnaire) !== '尚未開始'">
-                        <router-link :data-id="questionnaire.id" to="/result">結果</router-link>
+                        <router-link :data-id="questionnaire.id" to="/backstage/statistics" @click="setSession(questionnaire.id)">結果</router-link>
                     </td>
                     <td v-else>結果</td>
                 

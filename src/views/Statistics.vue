@@ -2,17 +2,19 @@
 import Chart from 'chart.js/auto';
 import axios from "axios";
 import {Colors} from 'chart.js';
+import chartXkcd from 'chart.xkcd';
 
 Chart.register(Colors);
 Chart.defaults.color = 'white';
-Chart.defaults.font.size = '14';
+Chart.defaults.font.size = 14;
 
 export default {
     data() {
         return {
             id: "",// Questionnaire 的 id
             questionnaireContentList: [],// 這題所有題目與選項
-            answerContentList: [],// 所有答這題的人的答案
+            answerContentList: [],// 所有答這題的人的答案,
+            theChart: [],
             
             
             findAllByQuestionnaireId: import.meta.env.VITE_FIND_ALL_BY_QUESTIONNAIRE_ID,
@@ -36,59 +38,81 @@ export default {
     methods: {
         makeChart(type) {
             const chartArr = document.querySelectorAll(".chart");
-            
             for (let i = 0; i < this.questionnaireContentList.length; i++) {
-                if (this.questionnaireContentList[i].type === "text"){
+                if (this.questionnaireContentList[i].type === "text") {
                     continue;
                 }
                 const options = this.questionnaireContentList[i].options.split(";")
                 const id = this.questionnaireContentList[i].id;
                 const filteredList = this.answerContentList.filter((item) => item.questionnaireContent.id === id);
                 const newArray = filteredList.map((item) => item.answer);
-                
+                console.log(newArray)
                 const temp = newArray.flatMap(item => item.split(';'));
-                console.log(temp)
                 const result = options.reduce((accumulator, currentValue) => {
                     const count = temp.filter((item) => item === currentValue).length;
                     accumulator.push(count);
                     return accumulator;
                 }, []);
-                (function() {
-                    new Chart(chartArr[i], {
-                        type: type,
-                        data: {
-                            labels: options,
-                            datasets: [
-                                {
-                                    data: result,
-                                },
-                            ],
-                        },
-                        options: {
-                            plugins: {
-                                colors: {
-                                    forceOverride: true, // 強制使用 Char.js 提供的顏色
-                                },
-                                title: {
-                                    display: true,
-                                    text: this.questionnaireContentList[i].question,
-                                },
+                
+                // 銷毀先前的圖表
+                if (this.theChart[i]) {
+                    this.theChart[i].destroy();
+                }
+                
+                this.theChart[i] = new Chart(chartArr[i], {
+                    type: type,
+                    data: {
+                        labels: options,
+                        datasets: [
+                            {
+                                label: "",
+                                data: result,
                             },
-                            responsive: true,
+                        ],
+                    },
+                    options: {
+                        plugins: {
+                            colors: {
+                                forceOverride: true, // 強制使用 Char.js 提供的顏色
+                            },
+                            title: {
+                                display: true,
+                                text: this.questionnaireContentList[i].question,
+                            },
                         },
-                    });
-                }).call(this);
+                        responsive: true,
+                    },
+                });
             }
-        }
-        
+        },
+        makeTreasure() {
+        },
     }
 }
 </script>
 
 <template>
     <div class="statistics">
-        <div v-for="(content,index) in questionnaireContentList" :key="index" class="chart-block" :class="[index % 2 === 0? 'align-self-left' : 'align-self-right']">
-            <canvas class="chart"></canvas>
+        <div class="btn-block">
+            <button type="button" @click="makeChart('pie')">圓餅圖</button>
+            <button type="button" @click="makeChart('bar')">值條圖</button>
+            <button type="button" @click="makeTreasure('treasure')">藏寶圖</button>
+        </div>
+        <div v-for="(content,index) in questionnaireContentList" :key="index"
+             :class="[index % 2 === 0? 'align-self-left' : 'align-self-right']"
+             class="chart-block">
+            <canvas v-if="content.type !=='text'" class="chart"></canvas>
+            <div v-else class="text-block">
+                <p>{{ content.question }}</p>
+                <template v-for="(answer,index) in answerContentList" :key="index">
+                    <ul v-if="answer.questionnaireContent.id === content.id">
+                        <li> •{{ answer.answer }}</li>
+                    </ul>
+                </template>
+            </div>
+        </div>
+        <div>
+            <svg class="line-chart"></svg>
         </div>
     </div>
 </template>
@@ -97,12 +121,34 @@ export default {
 .statistics {
     height: 600px;
     overflow: auto;
-    padding: 10px 0 10px 10px;
+    padding: 20px 10px 10px 10px;
     display: flex;
     flex-direction: column;
+    position: relative;
+    
+    .btn-block {
+        position: absolute;
+        top: 25px;
+        right: 25px;
+        
+        button {
+            margin: 10px;
+        }
+    }
+    
+    .text-block {
+        font-size: 25px;
+        
+        li {
+            font-size: 20px;
+            padding-top: 10px;
+            padding-left: 8px;
+        }
+    }
     
     .chart-block {
         width: 400px;
+        margin-bottom: 10px;
     }
 }
 

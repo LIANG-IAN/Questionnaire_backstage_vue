@@ -32,7 +32,7 @@ const router = createRouter({
         {
             path: '/backstage',
             name: 'backstage',
-            component: () => import("../views/backstage.vue"),
+            component: () => import("../views/Backstage.vue"),
             redirect: '/backstage/questionnaireManage',
             children: [
                 {

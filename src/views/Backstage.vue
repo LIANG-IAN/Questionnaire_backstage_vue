@@ -1,24 +1,25 @@
 <script>
 
 export default {
-  data() {
-    return {
-      selectedIndex: 0,
-        id:sessionStorage.getItem("id")
-    }
-  },
-  methods: {
-    // 頁標渲染
-    selectTab(index) {
-      this.selectedIndex = index;
+    data() {
+        return {
+            selectedIndex: 0,
+            id: sessionStorage.getItem("id"),
+            identity: sessionStorage.getItem("identity"),
+        }
     },
-    
-    
-    // 跳轉頁面
-    navigateTo(path) {
-      this.$router.push(path);
-    }
-  },
+    methods: {
+        // 頁標渲染
+        selectTab(index) {
+            this.selectedIndex = index;
+        },
+        
+        
+        // 跳轉頁面
+        navigateTo(path) {
+            this.$router.push(path);
+        }
+    },
     mounted() {
         const path = this.$route.path;
         switch (path) {
@@ -43,22 +44,25 @@ export default {
 </script>
 
 <template>
-  <div class="backstage">
-    <header>
-      <span :class="{ 'render-gray': selectedIndex === 0 }"
+    <div class="backstage">
+        <header>
+      <span v-if="identity === 'true'"
+            :class="{ 'render-gray': selectedIndex === 0 }"
             @click="navigateTo('/backstage/questionnaireManage'); selectTab(0)">問卷</span>
-      <span :class="{ 'render-gray': selectedIndex === 1 }"
-            @click="navigateTo('/backstage/topic'); selectTab(1)">問卷題目</span>
-      <span :class="{ 'render-gray': selectedIndex === 2 }"
-            @click="navigateTo('/backstage/feedback'); selectTab(2)" v-show="id !== null">問卷回饋</span>
-      <span :class="{ 'render-gray': selectedIndex === 3 }"
-            @click="navigateTo('/backstage/statistics'); selectTab(3)" v-show="id !== null">統計</span>
-    </header>
-    <div class="router-view">
-      <RouterView/>
-        <button type="button" class="roll-back" @click="navigateTo('/Overview')">回總覽</button>
+            <span v-if="identity === 'true'"
+                  :class="{ 'render-gray': selectedIndex === 1 }" @click="navigateTo('/backstage/topic'); selectTab(1)">問卷題目</span>
+            <span v-if="id !== null && identity === 'true'"
+                  :class="{ 'render-gray': selectedIndex === 2 }"
+                  @click="navigateTo('/backstage/feedback'); selectTab(2)">問卷回饋</span>
+            <span v-if="id !== null"
+                  :class="{ 'render-gray': selectedIndex === 3 }"
+                  @click="navigateTo('/backstage/statistics'); selectTab(3)">統計</span>
+        </header>
+        <div class="router-view">
+            <RouterView/>
+            <button class="roll-back" type="button" @click="navigateTo('/Overview')">回總覽</button>
+        </div>
     </div>
-  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -97,8 +101,8 @@ export default {
         border-radius: 0 0 10px 10px;
         position: relative;
         
-        .roll-back{
-        position: fixed;
+        .roll-back {
+            position: fixed;
             right: 150px;
             bottom: 50px;
         }

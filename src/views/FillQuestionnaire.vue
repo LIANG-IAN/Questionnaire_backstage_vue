@@ -26,7 +26,6 @@ export default {
     mounted() {
         axios.post(this.findByQuestionnaireId, {"id": this.id}).then(response => {
             this.questionnaire = response.data.questionnaire
-            // console.log(this.questionnaire)
         })
         
         axios.post(this.findAllByQuestionnaireId, {"questionnaireId": this.id}).then(response => {
@@ -103,7 +102,6 @@ export default {
             this.setReadOnly(1);
             this.judge();
             this.getCheckbox();
-            // console.log(this.answerContentArray)
         },
         
         
@@ -156,7 +154,7 @@ export default {
                             }
                         }
                         axios.post(this.addAnswerRecord, body).then(response => {
-                            console.log(response.data.message);
+                            this.$router.push("/Overview");
                         })
                     }
                 })
