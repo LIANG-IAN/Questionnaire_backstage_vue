@@ -54,13 +54,30 @@ export default {
         },
         
         //檢查結束時間
-        checkEndTime(){
+        checkEndTime() {
             if (this.questionnaire.endTime < new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000)
                 .toISOString()
-                .substring(0, 10)){
+                .substring(0, 10)) {
                 this.questionnaire.endTime = null;
             }
-           }
+        },
+        
+        //檢查能否編輯
+        checkEdit(questionnaire){
+            const today = Date.now(); // 今天日期
+            const startingTime = new Date(questionnaire.startingTime);
+            const endTime = new Date(questionnaire.endTime);
+            
+            if (today < startingTime) {
+                return false;
+            }
+            else if (today > endTime) {
+                return true;
+            }
+            else {
+                return true;
+            }
+        }
         
     },
     watch: {
@@ -81,12 +98,12 @@ export default {
         <div class="container">
             <div class="box">
                 <label for="name">問卷名稱</label>
-                <input id="name" v-model.trim="questionnaire.questionnaire" type="text">
+                <input id="name" v-model.trim="questionnaire.questionnaire" type="text" :disabled="checkEdit(questionnaire)">
             </div>
             
             <div class="box">
                 <label for="content">描述內容</label>
-                <input id="content" v-model.trim="questionnaire.mainPoint" type="text">
+                <input id="content" v-model.trim="questionnaire.mainPoint" type="text" :disabled="checkEdit(questionnaire)">
             </div>
             
             <div class="box">
@@ -112,11 +129,12 @@ export default {
     flex-direction: column;
     height: 600px;
     
-    button{
+    button {
         width: 200px;
         margin-bottom: 50px;
         margin-left: 300px;
     }
+    
     .container {
         display: flex;
         flex-direction: column;
@@ -124,8 +142,8 @@ export default {
         margin: 0 10px 0 30px;
         padding: 20px 0;
         
-        .box{
-        padding-bottom: 50px;
+        .box {
+            padding-bottom: 50px;
         }
     }
 }

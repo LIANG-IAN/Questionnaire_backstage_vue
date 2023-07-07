@@ -163,12 +163,12 @@ export default {
                     
                     
                     <!--   是否渲染 router-link   -->
-                    <td v-if="getState(questionnaire) === '進行中'">
+                    <td v-if="identity === 'true'">
                         <router-link :data-id="questionnaire.id" :to="path" @click="setSession(questionnaire.id)">
                             {{ questionnaire.questionnaire }}
                         </router-link>
                     </td>
-                    <td v-else-if="identity === 'true'">
+                    <td v-else-if="identity === 'false'&& getState(questionnaire) === '進行中'">
                         <router-link :data-id="questionnaire.id" :to="path" @click="setSession(questionnaire.id)">
                             {{ questionnaire.questionnaire }}
                         </router-link>
