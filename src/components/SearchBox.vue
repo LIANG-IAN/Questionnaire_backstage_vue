@@ -13,33 +13,59 @@ export default {
             
             findAll: import.meta.env.VITE_FIND_ALL,
             findByQuestionnaireFuzzySearch: import.meta.env.VITE_FIND_BY_QUESTIONNAIRE_FUZZY_SEARCH,
-            viteFindByStartingTime: import.meta.env.VITE_FIND_BY_STARTING_TIME,
-            viteFindByEndTime: import.meta.env.VITE_FIND_BY_END_TIME,
-            viteFindByStartingTimeBetween: import.meta.env.VITE_FIND_BY_STARTING_TIME_BETWEEN
+            findByStartingTime: import.meta.env.VITE_FIND_BY_STARTING_TIME,
+            findByEndTime: import.meta.env.VITE_FIND_BY_END_TIME,
+            findByStartingTimeBetween: import.meta.env.VITE_FIND_BY_STARTING_TIME_BETWEEN,
+            findByQuestionnaireFuzzySearchAndStartingTimeThanEqual: import.meta.env.VITE_FIND_BY_QUESTIONNAIRE_FUZZY_SEARCH_AND_STARTING_TIME_THAN_EQUAL,
+            findByQuestionnaireFuzzySearchAndEndTimeLessThanEqual: import.meta.env.VITE_FIND_BY_QUESTIONNAIRE_FUZZY_SEARCH_AND_END_TIME_LESS_THAN_EQUAL,
+            findByQuestionnaireFuzzySearchStartingTimeThanEqualAndEndTimeLessThanEqual: import.meta.env.VITE_FIND_BY_QUESTIONNAIRE_FUZZY_SEARCH_STARTING_TIME_THAN_EQUAL_AND_END_TIME_LESS_THAN_EQUAL
         }
     },
     methods: {
         // 模糊搜尋問卷
         searchQuestionnaireFuzzy(name, startingTime, endTime) {
-            // TODO
-            // name 有值，優先搜尋
-            if (name && name.trim() !== "") {
+            if (name && name.trim() !== "" && startingTime !== "" && endTime !== "") {
+                axios.post(this.findByQuestionnaireFuzzySearchStartingTimeThanEqualAndEndTimeLessThanEqual, {
+                    "questionnaire": name,
+                    "startingTime": startingTime,
+                    "endTime": endTime
+                }).then(response => {
+                    this.questionnaireList = response.data.questionnaireList;
+                })
+            }
+            else if (name && name.trim() !== "" && startingTime !== "") {
+                axios.post(this.findByQuestionnaireFuzzySearchAndStartingTimeThanEqual, {
+                    "questionnaire": name,
+                    "startingTime": startingTime
+                }).then(response => {
+                    this.questionnaireList = response.data.questionnaireList;
+                })
+            }
+            else if (name && name.trim() !== "" && endTime !== "") {
+                axios.post(this.findByQuestionnaireFuzzySearchAndEndTimeLessThanEqual, {
+                    "questionnaire": name,
+                    "endTime": endTime
+                }).then(response => {
+                    this.questionnaireList = response.data.questionnaireList;
+                })
+            }
+            else if (name && name.trim() !== "") {
                 axios.post(this.findByQuestionnaireFuzzySearch, {"questionnaire": name}).then(response => {
                     this.questionnaireList = response.data.questionnaireList;
                 })
             }
             else if (startingTime !== "" && endTime === "") {
-                axios.post(this.viteFindByStartingTime, {"startingTime": startingTime}).then(response => {
+                axios.post(this.findByStartingTime, {"startingTime": startingTime}).then(response => {
                     this.questionnaireList = response.data.questionnaireList;
                 })
             }
             else if (startingTime === "" && endTime !== "") {
-                axios.post(this.viteFindByEndTime, {"endTime": endTime}).then(response => {
+                axios.post(this.findByEndTime, {"endTime": endTime}).then(response => {
                     this.questionnaireList = response.data.questionnaireList;
                 })
             }
             else if (startingTime !== "" && endTime !== "") {
-                axios.post(this.viteFindByStartingTimeBetween, {
+                axios.post(this.findByStartingTimeBetween, {
                     "startingTime": startingTime,
                     "endTime": endTime
                 }).then(response => {
@@ -86,18 +112,19 @@ export default {
     justify-content: center;
     align-items: start;
     
-    button{
-      padding: 10px;
+    button {
+        padding: 10px;
     }
     
     .title-search {
         margin-bottom: 20px;
-        input{
+        
+        input {
             margin-left: 20px;
         }
     }
     
-    .time-search{
+    .time-search {
         margin-bottom: 20px;
         
     }

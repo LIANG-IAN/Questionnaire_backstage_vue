@@ -5,8 +5,6 @@ export default {
     data() {
         return {
             id: sessionStorage.getItem("id"),
-            //TODO
-            // id:30,
             questionnaire: {
                 questionnaire: "",
                 mainPoint: "",
@@ -57,7 +55,11 @@ export default {
         
         //檢查結束時間
         checkEndTime(){
-           
+            if (this.questionnaire.endTime < new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000)
+                .toISOString()
+                .substring(0, 10)){
+                this.questionnaire.endTime = null;
+            }
            }
         
     },

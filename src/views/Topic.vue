@@ -91,7 +91,7 @@ export default {
                 if (storedQuestionnaire) {
                     const questionnaire = JSON.parse(storedQuestionnaire);
                     await axios.post(this.addQuestionnaire, {questionnaire: questionnaire}).then(response => {
-                        alert("新增Questionnaire: " + response.data.message);
+                        alert(response.data.message);
                         this.id = response.data.questionnaire.id;
                         sessionStorage.setItem("id", this.id)
                     })
@@ -107,7 +107,7 @@ export default {
             axios.post(this.addQuestionnaireContent, {
                 questionnaireContentList: this.questionnaireContentList,
             }).then((response) => {
-                alert("新增QuestionnaireContent: " + response.data.message);
+                alert(response.data.message);
             });
         },
         
