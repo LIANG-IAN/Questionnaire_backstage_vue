@@ -2,7 +2,6 @@
 import Chart from 'chart.js/auto';
 import axios from "axios";
 import {Colors} from 'chart.js';
-import chartXkcd from 'chart.xkcd';
 
 Chart.register(Colors);
 Chart.defaults.color = 'white';
