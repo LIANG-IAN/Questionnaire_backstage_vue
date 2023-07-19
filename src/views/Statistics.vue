@@ -15,7 +15,6 @@ export default {
             questionnaireContentList: [],// 這題所有題目與選項
             answerContentList: [],// 所有答這題的人的答案,
             theChart: [],
-            treasure:false,
             
             findAllByQuestionnaireId: import.meta.env.VITE_FIND_ALL_BY_QUESTIONNAIRE_ID,
             findByQuestionnaireIdFromAnswerContent: import.meta.env.VITE_FIND_BY_QUESTIONNAIRE_ID_FROM_ANSWER_CONTENT,
@@ -37,10 +36,6 @@ export default {
     },
     methods: {
         makeChart(type) {
-            if (type === 'treasure'){
-                return this.treasure = true;
-            }
-            this.treasure = false;
             const chartArr = document.querySelectorAll(".chart");
             for (let i = 0; i < this.questionnaireContentList.length; i++) {
                 if (this.questionnaireContentList[i].type === "text") {
@@ -89,8 +84,6 @@ export default {
                 });
             }
         },
-        makeTreasure() {
-        },
     }
 }
 </script>
@@ -100,7 +93,6 @@ export default {
         <div class="btn-block">
             <button type="button" @click="makeChart('pie')">圓餅圖</button>
             <button type="button" @click="makeChart('bar')">值條圖</button>
-            <button type="button" @click="makeChart('treasure')">藏寶圖</button>
         </div>
         <div v-for="(content,index) in questionnaireContentList" :key="index"
              :class="[index % 2 === 0? 'align-self-left' : 'align-self-right']"
@@ -114,10 +106,6 @@ export default {
                     </ul>
                 </template>
             </div>
-        </div>
-        <div v-show="treasure" class="treasure">
-            <img src="../../public/1.gif" alt="">
-            <img src="../../public/螢幕擷取畫面 2023-07-07 103211.png" alt="" class="boy">
         </div>
     </div>
 </template>
@@ -156,37 +144,6 @@ export default {
         margin-bottom: 10px;
     }
     
-    .treasure{
-        margin: 0 auto;
-        position: relative;
-        .boy{
-            position: absolute;
-            border-radius: 50%;
-            width: 80px;
-            height: 80px;
-            left: 120px;
-            top: 20px;
-            animation: fade 10s linear infinite;
-            opacity: 0;
-        }
-    }
-}
-@keyframes fade {
-    0% {
-        opacity: 0;
-    }
-    80% {
-        opacity: 0;
-    }
-    90% {
-        opacity: 1;
-    }
-    92% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }
 }
 
 // 左右交錯用 class
