@@ -68,10 +68,8 @@ export default {
             const startingTime = new Date(questionnaire.startingTime);
             const endTime = new Date(questionnaire.endTime);
             if (!this.id){
-                console.log(11)
                 return false;
             }
-            
             if (today < startingTime) {
                 return false;
             }
